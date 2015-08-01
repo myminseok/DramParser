@@ -33,6 +33,8 @@ public class Parser {
 
         File outfiletemp = new File(outdirpath+File.separator+infile.getName()+".tmp");
 
+        String outfilepath=outdirpath + File.separator + infile.getName() + "." + outfileextension;
+
         if(!infile.exists()){
             System.out.println("file not found:"+infilepath);
         }
@@ -74,7 +76,14 @@ public class Parser {
                 }else{
 //                    System.out.println(serial+" no transit:" + sm+" / new cmd: "+command);
                 }
-                os.write(serial +"\t" + sm.currentState  + "\t " + command.getName() + "\t" + bigHex + "\t "+ transit +"\n");
+
+                StringBuilder sb = new StringBuilder();
+                sb.append(serial).append(",");
+                sb.append(sm.currentState).append(",");
+                sb.append(command.getName()).append(",");
+                sb.append(bigHex).append(",");
+                sb.append(transit).append("\n");
+                os.write(sb.toString());
                 commandMap.put(bigHex, command.getName().toString());
             }
             for(String key: commandMap.keySet()) {
@@ -86,14 +95,15 @@ public class Parser {
             if(os!=null) os.close();
         }
 
-        System.out.println("renaming: " + outfiletemp.getAbsolutePath() + " to " + infile.getName() + "." + outfileextension);
-        outfiletemp.renameTo(new File(outdirpath + File.separator + infile.getName() + "." + outfileextension));
+        System.out.println("renaming: " + outfiletemp.getAbsolutePath() + " to \n" + outfilepath);
+        outfiletemp.renameTo(new File(outfilepath));
 
 
         long lEndTime = System.currentTimeMillis()- lStartTime;
         System.out.println(GetFormattedInterval(lEndTime));
 
     }
+
 
     public static String GetFormattedInterval(final long ms) {
         long millis = ms % 1000;

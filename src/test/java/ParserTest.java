@@ -17,7 +17,7 @@ public class ParserTest extends TestCase{
     public void testApp() throws Exception{
         String infilepath="/Users/kimm5/_dev/DramParser/src/test/resources/testdata/sample";
         String outdirpath="/Users/kimm5/_dev/DramParser/src/test/resources/out";
-        new Parser(infilepath,outdirpath, "out").execute();
+        new Parser(infilepath,outdirpath, "csv").execute();
     }
 
 }

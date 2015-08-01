@@ -19,7 +19,7 @@ public class Options {
     }
 
     public String getOutfileextension() {
-        return outfileextension==null?"out":outfileextension;
+        return outfileextension==null?"csv":outfileextension;
     }
 
     @ModuleOption("the file path to process")
