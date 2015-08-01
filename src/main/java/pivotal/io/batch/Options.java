@@ -15,7 +15,7 @@ public class Options {
     }
 
     public String getOutdirpath() {
-        return outdirpath;
+        return outdirpath==null?"/tmp":outdirpath;
     }
 
     public String getOutfileextension() {

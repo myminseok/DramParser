@@ -97,25 +97,11 @@ public class DRAMFileParserTasklet implements Tasklet, StepExecutionListener {
 					stepExecutionContext.put(jobParameterEntry.getKey(), jobParameterEntry.getValue().getValue());
 				}
 
-//				if("infilepath".equals(jobParameterEntry.getKey())){
-//					infilepath=jobParameterEntry.getValue().getValue().toString();
-//					System.out.println("jobparam:infilepath:"+infilepath);
-//				}
-
 				if("absoluteFilePath".equals(jobParameterEntry.getKey())){
 					infilepath=jobParameterEntry.getValue().getValue().toString();
 					System.out.println("jobparam: infilepath(absoluteFilePath):"+infilepath);
 				}
 
-//				if("outdirpath".equals(jobParameterEntry.getKey())){
-//					outdirpath=jobParameterEntry.getValue().getValue().toString();
-//					System.out.println("jobparam:outdirpath:"+outdirpath);
-//				}
-//
-//				if("outfileextension".equals(jobParameterEntry.getKey())){
-//					outfileextension=jobParameterEntry.getValue().getValue().toString();
-//					System.out.println("jobparam:outfileextension:"+outfileextension);
-//				}
 			}
 
 			if (jobParameters.getString("throwError") != null

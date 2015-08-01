@@ -15,7 +15,6 @@
 
 	<bean id="DRAMFileParserTasklet"
 		class="pivotal.io.batch.DRAMFileParserTasklet">
-		<!--<property name="infilepath" value="${infilepath}"/>-->
 		<property name="outdirpath" value="${outdirpath}"/>
 		<property name="outfileextension" value="${outfileextension}"/>
 	</bean>

@@ -1,7 +1,6 @@
-Spring XD Simple Batch Sample
+Spring XD
 =============================
 
-In this *Hello World* example for *Spring XD* you will create a minimal code-based Job. This Job does no processing, only printing out `Hello Spring XD!` as well as any Job parameters that were passed into the Job so as to focus only on the mechanics of the compilation and copying of artifacts into the Spring XD installation directory.
 
 ## Requirements
 
@@ -66,13 +65,24 @@ Now start the *Spring XD Shell* in a separate window:
 	Welcome to the Spring XD shell. For assistance hit TAB or type "help".
 	xd:>
 
+	job destroy --name dramjob
+	stream destroy --name dram
+	module delete --name job:dramparser
+
+
 First install the module using the `module upload` command:
 
-	xd:>module upload --type job --name myjob --file [path-to]/springxd-batch-simple-1.0.0.BUILD-SNAPSHOT.jar
+	xd:> module upload --type job --name dramparser --file [path-to]DramParser/target/springxd-batch-dramparser-1.0.0.BUILD-SNAPSHOT.jar
+
+    module info job:dramparser
 
 You will now create a new Batch Job Stream using the *Spring XD Shell*:
 
-	xd:>job create --name helloSpringXD --definition "myjob"
+	xd:>job create --name dramjob --definition "dramparser --outdirpath=/tmp/xd " --deploy
+	    job create --name dramjob --definition "dramparser --outdirpath=/tmp/xd --outfileextension=xxx" --deploy
+
+        stream create --name dram --definition "file --mode=ref --dir=/Users/kimm5/_dev/DramParser/src/test/resources/testdata > queue:job:dramjob " --deploy
+
 
 The UI is located on the machine where xd-singlenode is running and will show you the jobs that can be deployed. The UI is located at:
 
