@@ -31,12 +31,13 @@ public class Parser {
 
         File infile = new File(infilepath);
 
-        File outfile = new File(outdirpath+File.separator+infile.getName()+"."+outfileextension);
+        File outfiletemp = new File(outdirpath+File.separator+infile.getName()+".tmp");
+
         if(!infile.exists()){
             System.out.println("file not found:"+infilepath);
         }
 
-        if(!outfile.exists()){
+        if(!outfiletemp.exists()){
             System.out.println("file not found:"+outdirpath);
         }
 
@@ -50,7 +51,7 @@ public class Parser {
         try {
 
             is = new FileInputStream(infile);
-            os = new FileWriter(outfile);
+            os = new FileWriter(outfiletemp);
             int serial=0;
             String bigHex="";
             Command command;
@@ -85,12 +86,12 @@ public class Parser {
             if(os!=null) os.close();
         }
 
+        System.out.println("renaming: " + outfiletemp.getAbsolutePath() + " to " + infile.getName() + "." + outfileextension);
+        outfiletemp.renameTo(new File(outdirpath + File.separator + infile.getName() + "." + outfileextension));
 
 
         long lEndTime = System.currentTimeMillis()- lStartTime;
-
         System.out.println(GetFormattedInterval(lEndTime));
-
 
     }
 
