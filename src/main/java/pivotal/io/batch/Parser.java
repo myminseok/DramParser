@@ -56,35 +56,52 @@ public class Parser {
             os = new FileWriter(outfiletemp);
             int serial=0;
             String bigHex="";
+            String bits="";
+            String parsed="";
+            String result;
             Command command;
-            byte[] buffer = new byte[4];
+            //byte[] buffer = new byte[4];
             byte[] bufferBig = new byte[4];
 
             boolean transit=false;
 
-            while (is.read(buffer) >= 0 ) {
+            while (is.read(bufferBig) >= 0 ) {
                 serial++;
-//                System.out.println(Command.byteToBits(buffer));
-                bufferBig=Command.getBigEndian(buffer);
-//                System.out.println(Command.byteToBits(bufferBig));
-                command= sm.getCommand(bufferBig);
-                bigHex=Command.bytesToHex(bufferBig);
+//                command= sm.getCommand(bufferBig);
+//                bits= command.byteToBits();
+//                bigHex=command.byteToHexs();
 //                System.out.println(bigHex);
-                transit = sm.transit(command);
-                if(transit){
-                    System.out.println(serial+" transit:" + sm+" / new cmd: "+command);
-                }else{
-//                    System.out.println(serial+" no transit:" + sm+" / new cmd: "+command);
-                }
+//                if(sm.ignore(command)){
 
+//                }
+//                transit = sm.transit(command);
+//                if(transit){
+//                    System.out.println(serial+" transit:" + sm+" / new cmd: "+command);
+//                }else{
+////                    System.out.println(serial+" no transit:" + sm+" / new cmd: "+command);
+//                }
+                bits = Command.byteToBits(bufferBig);
+                bigHex = Command.bytesToHex(bufferBig);
+                parsed = Command.parse(bufferBig);
                 StringBuilder sb = new StringBuilder();
                 sb.append(serial).append(",");
-                sb.append(sm.currentState).append(",");
-                sb.append(command.getName()).append(",");
+                sb.append(bits).append(",");
                 sb.append(bigHex).append(",");
-                sb.append(transit).append("\n");
-                os.write(sb.toString());
-                commandMap.put(bigHex, command.getName().toString());
+                sb.append(parsed).append("\n");
+
+                result = sb.toString();
+//                sb.append(sm.currentState).append(",");
+//                sb.append(command.getName()).append(",");
+//                sb.append(transit).append("\n");
+
+                if(!commandMap.containsKey(bits)){
+                    commandMap.put(bits, result);
+                    os.write(result);
+                    //System.out.println(result);
+
+                }
+
+
             }
             for(String key: commandMap.keySet()) {
                 System.out.println(key+" "+commandMap.get(key));

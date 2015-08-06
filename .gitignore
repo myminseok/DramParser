@@ -8,3 +8,5 @@
 .DS_Store
 **/*.class
 /src/test/resources/out/**
+/src/test/resources/testdata/**
+

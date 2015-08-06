@@ -1,7 +1,7 @@
 package pivotal.io.batch.domain;
 
 /**
-
+ignore command
  */
 public class CommandNOP extends Command{
     public CommandNOP(){
@@ -13,15 +13,6 @@ public class CommandNOP extends Command{
         this.setA16(1);
         this.setA15(1);
         this.setA14(1);
-    }
-
-//    // no transtion
-//    void initStateTransitonMap(){
-//    }
-
-    // no transtion
-    public State.type nextState(State.type type){
-        return type;
     }
 
     public boolean isMatching(byte[] v){

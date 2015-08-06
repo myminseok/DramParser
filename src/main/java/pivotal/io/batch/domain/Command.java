@@ -6,12 +6,13 @@ public abstract class Command {
     byte bytes[] = new byte[]{0,0,0,0};
 //    Map<State.type, State.type> stateTransitionMap = new HashMap<State.type, State.type>();
     public  enum type{
-        UND, DES, REF, PRE, PDX, ACT, PDE, WR, RD,NOP ;
+        UND, MRS, DES, REF, PRE, RFU,PDX, ACT, PDE, WR, RD, ZQC, NOP ;
 
     }
 
 //    abstract void initStateTransitonMap();
     public abstract boolean isMatching(byte[] v);
+
 
     public Command(){
 //        initStateTransitonMap();
@@ -22,6 +23,9 @@ public abstract class Command {
 //        initStateTransitonMap();
     }
 
+    public void setBytes(byte[] v){
+        this.bytes = v;
+    }
 
 
     public type getName() {
@@ -227,11 +231,15 @@ public abstract class Command {
     }
 
 
+    public String byteToHexs(){
+        return bytesToHex(this.bytes);
+    }
 
     public String byteToBits(){
         return byteToBits(this.bytes);
     }
     final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
+
     public static String bytesToHex(byte[] bytes) {
         char[] hexChars = new char[bytes.length * 2];
         for ( int j = 0; j < bytes.length; j++ ) {

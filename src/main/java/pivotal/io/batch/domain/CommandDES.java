@@ -1,7 +1,7 @@
 package pivotal.io.batch.domain;
 
 /**
-
+ignore명령
  */
 public class CommandDES extends Command{
 
@@ -10,10 +10,6 @@ public class CommandDES extends Command{
         this.setCKE0(1);
         this.setCS0(1);
     }
-
-//    // no transtion
-//    void initStateTransitonMap(){
-//    }
 
     // no transtion
     public State.type nextState(State.type type){

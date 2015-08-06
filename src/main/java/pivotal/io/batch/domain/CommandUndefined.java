@@ -7,9 +7,6 @@ public class CommandUndefined extends Command{
         this.name = type.UND;
     }
 
-//    void initStateTransitonMap(){
-//    }
-
     public boolean isMatching(byte[] v){
         return false;
     }

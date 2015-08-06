@@ -2,9 +2,7 @@ package pivotal.io.batch;
 
 import pivotal.io.batch.domain.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by kimm5 on 8/1/15.
@@ -13,11 +11,14 @@ public class StateMachine {
 
     public static Command undefinedCommand = new CommandUndefined();
     public ArrayList<Command> commands = new ArrayList();
+    public Set commandToIgnore= new HashSet<Command.type>();
+
     Map<State.type, State> stateObjectMap = new HashMap<State.type, State>();
 
     public State.type prevSate;
     public State.type currentState;
     public Command currentCommand;
+
 
     public StateMachine(){
         currentState = State.type.Undefined;
@@ -29,10 +30,13 @@ public class StateMachine {
         return this.stateObjectMap.get(state);
     }
 
+    public boolean ignore(Command command){
+        return commandToIgnore.contains(command.getName());
+    }
 
     public boolean transit(Command command){
-        State.type next = getState(currentState).nextState(command.getName());
 
+        State.type next = getState(currentState).nextState(command.getName());
         if(next.equals(State.type.Undefined)){
             return false;
         }else{
@@ -43,14 +47,6 @@ public class StateMachine {
         }
 
     }
-
-
-    public boolean isValidTransit(Command command){
-        State.type next = getState(currentState).nextState(command.getName());
-        return !next.equals(State.type.Undefined);
-    }
-
-
 
     private void initStateObject(){
         stateObjectMap.put(State.type.Undefined, StateUndefined.getInstance());
@@ -63,35 +59,33 @@ public class StateMachine {
 
 
     private void initCommand(){
-//
-//        Command pdx = new Command("PDX");
-//        pde.setCKE0(1);
-//        pde.setCS0(1);
 
-
-        Command des = new CommandDES();
-        Command nop = new CommandNOP();
+        Command mrs = new CommandMRS();
         Command ref = new CommandREF();
-//        Command sre = new CommandSRE();
-        Command act = new CommandACT();
         Command pre = new CommandPRE();//PRE,PREA
         Command wr = new CommandWR();
         Command rd = new CommandRD();
+        Command pdx= new CommandPDX();
+        Command pde= new CommandPDE(); // = SRE
+        Command act = new CommandACT();
+        Command nop = new CommandNOP();
 
-
-
-// keep order
-        commands.add(nop);
-        commands.add(rd);
-        commands.add(wr);
+        commands.add(mrs);
         commands.add(ref);
-        commands.add(des);
         commands.add(pre);
-//        commands.add(sre);
+        commands.add(wr);
+        commands.add(rd);
+        commands.add(pdx);
+        commands.add(pde);
         commands.add(act);
+        commands.add(nop);
+
+
+        commandToIgnore.add(Command.type.DES);
+        commandToIgnore.add(Command.type.NOP);
+        commandToIgnore.add(Command.type.RFU);
 
     }
-
 
 
     public Command.type getCommandType(byte[] v){
@@ -107,6 +101,7 @@ public class StateMachine {
     public Command getCommand(byte[] v){
         for(Command cmd: commands){
             if(cmd.isMatching(v)){
+                cmd.setBytes(v);
                 return cmd;
             };
         }
