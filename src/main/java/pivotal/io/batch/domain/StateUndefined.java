@@ -15,10 +15,14 @@ public class StateUndefined extends State{
 
     public StateUndefined() {
         name= type.Undefined;
-        initStateMap();
     }
 
-    void initStateMap(){
-        stateCommandMap2.put(Command.type.REF,  type.IDLE);
+
+
+    void initValidTransitMap(){
+        validTransitMap.put(StateCommand.type.REF,  type.IDLE);
+        validTransitMap.put(StateCommand.type.SRE,  type.IDLE);
+        validTransitMap.put(StateCommand.type.MRS,  type.IDLE);
+        validTransitMap.put(StateCommand.type.ZQC,  type.IDLE);
     }
 }

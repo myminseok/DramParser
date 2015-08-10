@@ -2,7 +2,7 @@ import junit.framework.TestCase;
 import org.apache.commons.lang.StringUtils;
 import pivotal.io.batch.Parser;
 import pivotal.io.batch.StateMachine;
-import pivotal.io.batch.domain.Command;
+import pivotal.io.batch.domain.StateCommand;
 
 import java.io.*;
 import java.util.HashMap;
@@ -50,14 +50,14 @@ public class RunValidatorTest extends TestCase {
             String result;
             line = br.readLine();
 
-            Command command;
+            StateCommand command;
             StateMachine sm = new StateMachine();
             while (line!=null) {
                 serial++;
                 split= StringUtils.split(line,',');
                 bigHex=split[2];
                 bytedata= javax.xml.bind.DatatypeConverter.parseHexBinary(bigHex);
-                command= sm.getCommand(bytedata);
+                command= sm.getStateCommand(bytedata);
                 bits= command.byteToBits();
                 bigHex=command.byteToHexs();
 
@@ -101,8 +101,8 @@ public class RunValidatorTest extends TestCase {
 
 
     public void testApp() throws Exception{
-        infilepath="/Users/kimm5/_dev/DramParser/src/test/data/out2/rawdata.txt.unique";
-        outdirpath="/Users/kimm5/_dev/DramParser/src/test/data/out2";
+        infilepath="/Users/kimm5/_dev/DramParser/src/test/data/out/rawdata.txt.unique.csv";
+        outdirpath="/Users/kimm5/_dev/DramParser/src/test/data/out";
         outfileextension="csv";
         execute();
     }

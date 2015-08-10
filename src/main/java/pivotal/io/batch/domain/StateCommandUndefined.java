@@ -3,25 +3,26 @@ package pivotal.io.batch.domain;
 /**
 
  */
-public class StateCommandCLEL extends StateCommand{
+public class StateCommandUndefined extends StateCommand{
 
     public static StateCommand instance=null;
 
     public static StateCommand getInstance(){
         if(instance==null){
-            instance= new StateCommandCLEL();
+            instance= new StateCommandUndefined();
         }
         return instance;
     }
 
-    public StateCommandCLEL(){
-        this.name= type.CKE_L;
+
+    public StateCommandUndefined(){
+        this.name= type.UND;
 
     }
 
 
     public boolean isMatching(byte[] v){
-        return this.getBit(v, INDEX.CKE0.getBinaryIndex())==0;
+        return false;
     }
 
 }

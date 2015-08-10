@@ -14,14 +14,11 @@ public class StateActivePowerDown extends State{
 
     private StateActivePowerDown() {
         name= type.ActivePowerDown;
-        initStateMap();
     }
 
-
-    void initStateMap(){
-//        stateCommandMap.put(type.ActivePowerDown, new Command.type[]{Command.type.PDX});
-        stateCommandMap2.put(Command.type.PDX, State.type.BankActive);
+    public void initValidTransitMap(){
+        validTransitMap.put(StateCommand.type.CKE_L, type.ActivePowerDown);
+        validTransitMap.put(StateCommand.type.PDX, type.BankActive);
     }
-
 
 }

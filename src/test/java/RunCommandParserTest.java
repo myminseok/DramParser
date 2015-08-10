@@ -1,47 +1,45 @@
-package pivotal.io.batch;
-
-import pivotal.io.batch.domain.State;
-import pivotal.io.batch.domain.StateCommand;
+import junit.framework.TestCase;
+import pivotal.io.batch.Parser;
+import pivotal.io.batch.StateMachine;
+import pivotal.io.batch.domain.*;
 
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Parser {
+/**
+ * Created by kimm5 on 8/1/15.
+ */
+public class RunCommandParserTest extends TestCase{
+
+
+    public RunCommandParserTest(String testName)
+    {
+        super( testName );
+    }
+
+    public void testApp() throws Exception{
+        String infilepath="/Users/kimm5/_dev/DramParser/src/test/data/testdata/rawdata.txt";
+        String outdirpath="/Users/kimm5/_dev/DramParser/src/test/data/out";
+        new CommandParser(infilepath,outdirpath, "csv").execute();
+    }
+
+}
+
+class CommandParser {
 
     private String infilepath=null;
     private String outdirpath=null;
     private String outfileextension=null;
 
 
-    public Parser(String infilepath, String outdirpath, String outfileextension){
+    public CommandParser(String infilepath, String outdirpath, String outfileextension){
         this.infilepath=infilepath;
         this.outdirpath=outdirpath;
         this.outfileextension=outfileextension;
         System.out.println("infilepath:"+infilepath);
         System.out.println("outdirpath:"+outdirpath);
-//        System.out.println("outfileextension:"+outfileextension);
-    }
-
-
-    private void printHeaderTransit(StateMachine sm ,FileWriter oTransit)  throws Exception{
-        StringBuilder sboTransit = new StringBuilder();
-        sboTransit.append("serial,\t");
-        sboTransit.append(sm.stateInfo.toStringHeader(true)).append(",\t");
-        sboTransit.append("bits,\t");
-        sboTransit.append(StateCommand.parseHeader());
-        sboTransit.append("\n");
-        oTransit.write(sboTransit.toString());
-    }
-    private void printHeaderInvalid(StateMachine sm ,FileWriter oInvalid)  throws Exception{
-        StringBuilder sboInvalid = new StringBuilder();
-        sboInvalid.append("serial,\t");
-        sboInvalid.append(sm.stateInfo.toStringHeader(false)).append(",\t");
-        sboInvalid.append("cmd,\t");
-        sboInvalid.append("bits,\t");
-        sboInvalid.append(StateCommand.parseHeader());
-        sboInvalid.append("\n");
-        oInvalid.write(sboInvalid.toString());
+        System.out.println("outfileextension:"+outfileextension);
     }
 
     public void execute() throws Exception{
@@ -54,6 +52,9 @@ public class Parser {
         File outfiletransit = new File(outdirpath+File.separator+infile.getName()+".transit.csv");
         File outfileinvalid = new File(outdirpath+File.separator+infile.getName()+".invalid.csv");
 
+
+        String outfilepath=outdirpath + File.separator + infile.getName() + "." + outfileextension;
+
         if(!infile.exists()){
             System.out.println("file not found:"+infilepath);
             throw new FileNotFoundException(infilepath);
@@ -62,7 +63,6 @@ public class Parser {
         InputStream is=null;
         FileWriter oUnique=null;
         FileWriter oTransit=null;
-        FileWriter oInvalid=null;
 
 
         StateMachine sm = new StateMachine();
@@ -73,53 +73,37 @@ public class Parser {
             is = new FileInputStream(infile);
             oUnique = new FileWriter(outfileUnique);
             oTransit = new FileWriter(outfiletransit);
-            oInvalid = new FileWriter(outfileinvalid);
             int serial=0;
             String bigHex="";
             String bits="";
             String parsed="";
+            String result;
+            StateCommand command;
             byte[] buffer = new byte[4];
             byte[] bufferFinal = new byte[4];
 
-            boolean isTransit=false;
-
-
-            printHeaderTransit(sm,oTransit );
-            printHeaderInvalid(sm, oInvalid);
-
-
-            String prevTransit="";
-            String prevNoTransit="";
+            boolean transit=false;
 
             while (is.read(buffer) >= 0 ) {
                 serial++;
                 bufferFinal = StateCommand.getBigEndian(buffer);
-                isTransit = sm.transit(bufferFinal);
+                command= sm.getStateCommand(bufferFinal);
                 bits = StateCommand.byteToBits(bufferFinal);
                 bigHex = StateCommand.bytesToHex(bufferFinal);
                 parsed = StateCommand.parse(bufferFinal);
 
-                if(isTransit){
-
-                    if(prevTransit.equals(bigHex)){ // prevent dup
-                        continue;
-                    }
-                    oTransit.write(String.format("%10s, %30s, %s, %s\n", serial, sm, bits, parsed));
-                    prevTransit=bigHex;
-
-                }else{
-
-                    if(prevNoTransit.equals(bigHex)){// prevent dup
-                        continue;
-                    }
-                    oInvalid.write(String.format("%10s, %15s, %15s, %s, %s\n", serial, sm, sm.getStateCommandType(bufferFinal), bits, parsed));
-//                    oInvalid.write(String.format("%10s, %15s, %s, %s\n", serial, sm,  bits, parsed));
-                    prevNoTransit=bigHex;
-                }
+                StringBuilder sb = new StringBuilder();
+                sb.append(serial).append(",");
+                sb.append(bits).append(",");
+                sb.append(bigHex).append(",");
+                sb.append(parsed).append(",");
+                sb.append(command.getName()).append(",");
+                sb.append("\n");
+                result = sb.toString();
 
                 if(!commandMap.containsKey(bits)){
-                    commandMap.put(bits, String.format("%s, %s, %s\n", bits, bigHex, parsed));
-                    oUnique.write( commandMap.get(bits));
+                    commandMap.put(bits, result);
+                    oUnique.write(result);
                 }
 
 
@@ -128,7 +112,6 @@ public class Parser {
         }finally{
             if(is!=null) is.close();
             if(oTransit!=null) oTransit.close();
-            if(oInvalid!=null) oInvalid.close();
             if(oUnique!=null) oUnique.close();
         }
 

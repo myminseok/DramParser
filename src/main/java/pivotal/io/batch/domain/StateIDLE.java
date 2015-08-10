@@ -16,16 +16,18 @@ public class StateIDLE extends State{
 
     public StateIDLE() {
         name= type.IDLE;
-        initStateMap();
     }
 
 
-    void initStateMap(){
-//        stateCommandMap.put(type.IDLE, new Command.type[]{Command.type.ACT, Command.type.PDE, Command.type.REF});
+    void initValidTransitMap(){
 
-        stateCommandMap2.put(Command.type.ACT, type.BankActive);
-//        stateCommandMap2.put(new CommandPDE(), new StateBankActive());
-        stateCommandMap2.put(Command.type.REF, type.IDLE);
+        validTransitMap.put(StateCommand.type.ACT, type.BankActive);
+        validTransitMap.put(StateCommand.type.REF, type.IDLE);
+        validTransitMap.put(StateCommand.type.PDE, type.IDLE);
+        validTransitMap.put(StateCommand.type.PDX, type.IDLE);
+        validTransitMap.put(StateCommand.type.ZQC, type.IDLE);
+        validTransitMap.put(StateCommand.type.MRS, type.IDLE);
+
 
     }
 

@@ -9,19 +9,19 @@ import java.util.*;
  */
 public class StateMachine {
 
-    public static Command undefinedCommand = new CommandUndefined();
-    public ArrayList<Command> commands = new ArrayList();
-    public Set commandToIgnore= new HashSet<Command.type>();
+    public ArrayList<StateCommand> commands = new ArrayList();
 
-    Map<State.type, State> stateObjectMap = new HashMap<State.type, State>();
+    protected Map<State.type, State> stateObjectMap = new HashMap<State.type, State>();
+    protected Map<StateCommand.type, StateCommand> stateCommandAllMap = new HashMap<StateCommand.type, StateCommand>();
+    protected Set<StateCommand.type> stateCommandAllMapKeyset;
 
-    public State.type prevSate;
-    public State.type currentState;
-    public Command currentCommand;
 
+    public StateInfo stateInfo = new StateInfo();
+
+    private StateReturnHolder stateReturnHolder = new StateReturnHolder();
 
     public StateMachine(){
-        currentState = State.type.Undefined;
+
         initCommand();
         initStateObject();
     }
@@ -30,110 +30,80 @@ public class StateMachine {
         return this.stateObjectMap.get(state);
     }
 
-    public boolean ignore(Command command){
-        return commandToIgnore.contains(command.getName());
-    }
-
-
-    public boolean transit(byte[] v) {
+    public boolean transit(byte[] bytes){
         // 현재 상태에서 가능한 명령 확인, ckel
         // 상태에 따라 명령의 해석이 달라짐.
+        stateInfo.clear();
+        stateReturnHolder.clear();
 
-
-            return true;
-    }
-
-    public boolean transit(Command command){
-
-        State.type next = getState(currentState).nextState(command.getName());
-        if(next.equals(State.type.Undefined)){
-            return false;
-        }else{
-            prevSate=currentState;
-            currentState= next;
-            currentCommand=command;
-            return true;
+        this.stateInfo.isTransit=stateInfo.currentState.nextState(stateCommandAllMap, bytes, stateReturnHolder);
+        this.stateInfo.newData=bytes;
+        if(this.stateInfo.isTransit){
+            this.stateInfo.prevState = this.stateInfo.currentState;
+            this.stateInfo.currentState = stateObjectMap.get(stateReturnHolder.nextStateType);
+            this.stateInfo.newCommand = this.stateReturnHolder.nextCommand;
         }
 
+        return this.stateInfo.isTransit;
     }
+
 
     private void initStateObject(){
         stateObjectMap.put(State.type.Undefined, StateUndefined.getInstance());
-        stateObjectMap.put(State.type.ActivePowerDown,  StateActivePowerDown.getInstance());
-        stateObjectMap.put(State.type.BankActive,  StateBankActive.getInstance());
+        stateObjectMap.put(State.type.ActivePowerDown, StateActivePowerDown.getInstance());
+        stateObjectMap.put(State.type.BankActive, StateBankActive.getInstance());
         stateObjectMap.put(State.type.IDLE,  StateIDLE.getInstance());
         stateObjectMap.put(State.type.Reading,  StateReading.getInstance());
         stateObjectMap.put(State.type.Writing,  StateWriting.getInstance());
+
+        Set<StateCommand.type> cmdSet = stateCommandAllMap.keySet();
+
+
     }
 
 
     private void initCommand(){
 
-        Command rfu = new CommandRFU();
-        Command mrs = new CommandMRS();
-        Command ref = new CommandREF();
-        Command pre = new CommandPRE();//PRE,PREA
-        Command wr = new CommandWR();
-        Command rd = new CommandRD();
-        Command pdx= new CommandPDX();
-        Command pde= new CommandPDE(); // = SRE
-        Command act = new CommandACT();
-        Command nop = new CommandNOP();
 
-        commands.add(rfu);
-        commands.add(mrs);
-        commands.add(ref);
-        commands.add(pre);
-        commands.add(wr);
-        commands.add(rd);
-        commands.add(pdx);
-        commands.add(pde);
-        commands.add(act);
-        commands.add(nop);
-
-
-        commandToIgnore.add(Command.type.DES);
-        commandToIgnore.add(Command.type.NOP);
-        commandToIgnore.add(Command.type.RFU);
+        stateCommandAllMap.put(StateCommand.type.UND, StateCommandUndefined.getInstance());
+        stateCommandAllMap.put(StateCommand.type.ACT, StateCommandACT.getInstance());
+        stateCommandAllMap.put(StateCommand.type.CKE_L, StateCommandCLEL.getInstance());
+        stateCommandAllMap.put(StateCommand.type.PDE, StateCommandPDE.getInstance());
+        stateCommandAllMap.put(StateCommand.type.PDX, StateCommandPDX.getInstance());
+        stateCommandAllMap.put(StateCommand.type.PRE, StateCommandPRE.getInstance());
+        stateCommandAllMap.put(StateCommand.type.RD, StateCommandRD.getInstance());
+        stateCommandAllMap.put(StateCommand.type.REF, StateCommandREF.getInstance());
+        stateCommandAllMap.put(StateCommand.type.WR, StateCommandWR.getInstance());
+        stateCommandAllMap.put(StateCommand.type.ZQC, StateCommandZQC.getInstance());
+        stateCommandAllMap.put(StateCommand.type.SRE, StateCommandZQC.getInstance());
+        stateCommandAllMap.put(StateCommand.type.MRS, StateCommandMRS.getInstance());
+        stateCommandAllMapKeyset = stateCommandAllMap.keySet();
 
     }
 
 
-    public Command.type getCommandType(byte[] v){
-        for(Command cmd: commands){
-            if(cmd.isMatching(v)){
-                return cmd.getName();
-            };
-        }
-        return Command.type.UND;
-    }
+    public StateCommand getStateCommand(byte[] bytes){
 
-
-    public Command getCommand(byte[] v){
-        for(Command cmd: commands){
-            if(cmd.isMatching(v)){
-                cmd.setBytes(v);
+        StateCommand cmd=null;
+        for(StateCommand.type cmdType: stateCommandAllMapKeyset){
+            cmd = stateCommandAllMap.get(cmdType);
+            if(cmd==null){
+                continue;
+            }
+            if(cmd.isMatching(bytes)){
                 return cmd;
-            };
+            }
         }
-        return undefinedCommand;
+        return StateCommandUndefined.getInstance();
     }
 
+    public StateCommand.type getStateCommandType(byte[] bytes){
+        return getStateCommand(bytes).getName();
+    }
 
     public String toString(){
-        StringBuilder sb = new StringBuilder();
-        sb.append("[SM:");
-        sb.append("prev:"+this.prevSate);
-        sb.append(", ");
-        sb.append("current:"+this.currentState);
-        sb.append(", ");
-        sb.append("by:" + (currentCommand == null ? "" : currentCommand.getName()));
-        sb.append("]");
-        return sb.toString();
+        return this.stateInfo.toString();
     }
-
-
-
 
 
 }

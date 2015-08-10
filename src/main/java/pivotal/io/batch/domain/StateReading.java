@@ -16,18 +16,13 @@ public class StateReading extends State{
 
     public StateReading() {
         name= type.Reading;
-        initStateMap();
     }
 
 
-    void initStateMap(){
-//        stateCommandMap.put(type.Reading, new Command.type[]{Command.type.WR, Command.type.RD, Command.type.PRE});
-
-
-        stateCommandMap2.put(Command.type.WR,  type.Writing);
-        stateCommandMap2.put(Command.type.RD,  type.Reading);
-        stateCommandMap2.put(Command.type.PRE,  type.IDLE);
-
+    void initValidTransitMap(){
+        validTransitMap.put(StateCommand.type.WR,  type.Writing);
+        validTransitMap.put(StateCommand.type.RD,  type.Reading);
+        validTransitMap.put(StateCommand.type.PRE,  type.IDLE);
     }
 
 

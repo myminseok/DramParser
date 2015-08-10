@@ -1,8 +1,11 @@
 package pivotal.io.batch.domain;
 
 
+import pivotal.io.batch.StateMachine;
+
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public abstract class State {
 
@@ -12,39 +15,40 @@ public abstract class State {
         Undefined, IDLE, BankActive, Writing, Reading, ActivePowerDown ;
     }
 
-
     public type getName() {
         return name;
     }
 
-//    Map<State.type, Command.type[]> stateCommandMap = new HashMap<State.type, Command.type[]>();
+    protected Map<StateCommand.type, State.type> validTransitMap = new HashMap<StateCommand.type, State.type>();
 
-    Map<Command.type, State.type> stateCommandMap2 = new HashMap<Command.type, State.type>();
-
-
-    public boolean ignore(Command command){
-        // TODO
-        return false;
-    }
-
+    protected Set<StateCommand.type> validTransitMapKeySet;
 
     public State() {
-
-        initStateMap();
+        initValidTransitMap();
+        validTransitMapKeySet= validTransitMap.keySet();
     }
 
-    abstract void initStateMap();
+    abstract void initValidTransitMap();
 
 
-    public State.type nextState(Command.type command){
-        if (!stateCommandMap2.containsKey(command)) return State.type.Undefined;
-        return stateCommandMap2.get(command);
+    public boolean nextState(Map<StateCommand.type, StateCommand> stateCommandFullSetMap, byte[] bytes,StateReturnHolder stateReturnHolder){
+        // type별 command 구현체 추출.
+        // command matching확인.
+        StateCommand cmd=null;
+        for(StateCommand.type cmdType: validTransitMapKeySet){
+            cmd = stateCommandFullSetMap.get(cmdType);
+            if(cmd==null){
+                continue;
+            }
+
+            if(cmd.isMatching(bytes)){
+                stateReturnHolder.nextCommand=cmd;
+                stateReturnHolder.nextStateType=validTransitMap.get(cmdType);
+                return true;
+            }
+        }
+        stateReturnHolder.nextStateType=type.Undefined;
+        return false;
     }
-
-//    public boolean isValid(State.type type, Command.type command){
-//        if(!stateCommandMap.containsKey(type)) return false;
-//        Command.type[] commands = stateCommandMap.get(type);
-//        return ArrayUtils.indexOf(commands, command)>-1;
-//    }
 
 }

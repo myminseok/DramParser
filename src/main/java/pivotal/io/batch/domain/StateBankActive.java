@@ -14,16 +14,13 @@ public class StateBankActive extends State{
 
     public StateBankActive() {
         name= type.BankActive;
-        initStateMap();
     }
 
-
-    void initStateMap(){
-//        stateCommandMap.put(type.BankActive, new Command.type[]{Command.type.PDX, Command.type.RD, Command.type.WR, Command.type.PRE});
-        stateCommandMap2.put(Command.type.PDE, type.ActivePowerDown);
-        stateCommandMap2.put(Command.type.RD,  type.Reading);
-        stateCommandMap2.put(Command.type.WR,  type.Writing);
-        stateCommandMap2.put(Command.type.PRE,  type.IDLE);
+    public void initValidTransitMap(){
+        validTransitMap.put(StateCommand.type.PDE, type.ActivePowerDown);
+        validTransitMap.put(StateCommand.type.RD,  type.Reading);
+        validTransitMap.put(StateCommand.type.WR,  type.Writing);
+        validTransitMap.put(StateCommand.type.PRE,  type.IDLE);
 
 
     }
