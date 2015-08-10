@@ -34,6 +34,15 @@ public class StateMachine {
         return commandToIgnore.contains(command.getName());
     }
 
+
+    public boolean transit(byte[] v) {
+        // 현재 상태에서 가능한 명령 확인, ckel
+        // 상태에 따라 명령의 해석이 달라짐.
+
+
+            return true;
+    }
+
     public boolean transit(Command command){
 
         State.type next = getState(currentState).nextState(command.getName());
@@ -60,6 +69,7 @@ public class StateMachine {
 
     private void initCommand(){
 
+        Command rfu = new CommandRFU();
         Command mrs = new CommandMRS();
         Command ref = new CommandREF();
         Command pre = new CommandPRE();//PRE,PREA
@@ -70,6 +80,7 @@ public class StateMachine {
         Command act = new CommandACT();
         Command nop = new CommandNOP();
 
+        commands.add(rfu);
         commands.add(mrs);
         commands.add(ref);
         commands.add(pre);

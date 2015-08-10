@@ -1,12 +1,12 @@
 package pivotal.io.batch.domain;
 
 /**
-
+ SRE, REF
  */
 public class CommandREF extends Command{
     public CommandREF(){
         this.name= Command.type.REF;
-        this.setCKE0(1);
+//        this.setCKE0(1);
         this.setCS0(0);
         this.setACTN(1);
         this.setA16(0);
@@ -17,12 +17,12 @@ public class CommandREF extends Command{
 
     public boolean isMatching(byte[] v){
 
-        return this.getBit(v,POS.CKE0.getPosition())==1 &&
-                this.getBit(v,POS.CS0.getPosition())==0 &&
-                this.getBit(v,POS.ACTN.getPosition())==1 &&
-                this.getBit(v,POS.A16.getPosition())==0 &&
-                this.getBit(v,POS.A15.getPosition())==0 &&
-                this.getBit(v,POS.A14.getPosition())==1
+//        return this.getBit(v,POS.CKE0.getBinaryIndex())==1 &&
+        return       this.getBit(v,POS.CS0.getBinaryIndex())==0 &&
+                this.getBit(v,POS.ACTN.getBinaryIndex())==1 &&
+                this.getBit(v,POS.A16.getBinaryIndex())==0 &&
+                this.getBit(v,POS.A15.getBinaryIndex())==0 &&
+                this.getBit(v,POS.A14.getBinaryIndex())==1
                 ;
     }
 

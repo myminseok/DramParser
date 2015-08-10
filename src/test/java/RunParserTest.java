@@ -1,19 +1,40 @@
-package pivotal.io.batch;
-
-import pivotal.io.batch.domain.Command;
+import junit.framework.TestCase;
+import pivotal.io.batch.Parser;
+import pivotal.io.batch.StateMachine;
+import pivotal.io.batch.domain.*;
 
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Parser {
+/**
+ * Created by kimm5 on 8/1/15.
+ */
+public class RunParserTest extends TestCase{
+
+
+    public RunParserTest(String testName)
+    {
+        super( testName );
+    }
+
+    public void testApp() throws Exception{
+//        String infilepath="/Users/kimm5/_dev/skhynix/rawdata/rawdata.txt";
+        String infilepath="/Users/kimm5/_dev/DramParser/src/test/resources/testdata/rawdata.txt2";
+        String outdirpath="/Users/kimm5/_dev/DramParser/src/test/resources/out2";
+        new CommandParser(infilepath,outdirpath, "csv").execute();
+    }
+
+}
+
+class CommandParser {
 
     private String infilepath=null;
     private String outdirpath=null;
     private String outfileextension=null;
 
 
-    public Parser(String infilepath, String outdirpath, String outfileextension){
+    public CommandParser(String infilepath, String outdirpath, String outfileextension){
         this.infilepath=infilepath;
         this.outdirpath=outdirpath;
         this.outfileextension=outfileextension;
@@ -66,9 +87,6 @@ public class Parser {
                 serial++;
                 bufferFinal = Command.getBigEndian(buffer);
                 command= sm.getCommand(bufferFinal);
-//                if(!sm.ignore(command)){
-//                     transit = sm.transit(command);
-//                }
                 bits = Command.byteToBits(bufferFinal);
                 bigHex = Command.bytesToHex(bufferFinal);
                 parsed = Command.parse(bufferFinal);
@@ -79,15 +97,9 @@ public class Parser {
                 sb.append(bigHex).append(",");
                 sb.append(parsed).append(",");
                 sb.append(command.getName()).append(",");
-//                sb.append(",->,");
-//                sb.append(sm.currentState).append(",");
-//                sb.append(transit).append(",");
                 sb.append("\n");
                 result = sb.toString();
 
-//                if(transit){
-//                    oTransit.write(result);
-//                }
                 if(!commandMap.containsKey(bits)){
                     commandMap.put(bits, result);
                     oUnique.write(result);

@@ -22,6 +22,12 @@ public abstract class State {
     Map<Command.type, State.type> stateCommandMap2 = new HashMap<Command.type, State.type>();
 
 
+    public boolean ignore(Command command){
+        // TODO
+        return false;
+    }
+
+
     public State() {
 
         initStateMap();
@@ -34,7 +40,6 @@ public abstract class State {
         if (!stateCommandMap2.containsKey(command)) return State.type.Undefined;
         return stateCommandMap2.get(command);
     }
-
 
 //    public boolean isValid(State.type type, Command.type command){
 //        if(!stateCommandMap.containsKey(type)) return false;

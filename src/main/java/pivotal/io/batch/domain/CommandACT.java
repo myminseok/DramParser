@@ -13,9 +13,9 @@ public class CommandACT extends Command{
 
     public boolean isMatching(byte[] v){
         return
-                this.getBit(v,POS.CKE0.getPosition())==1 &&
-                this.getBit(v,POS.CS0.getPosition())==0 &&
-                this.getBit(v,POS.ACTN.getPosition())==0;
+                this.getBit(v,POS.CKE0.getBinaryIndex())==1 &&
+                this.getBit(v,POS.CS0.getBinaryIndex())==0 &&
+                this.getBit(v,POS.ACTN.getBinaryIndex())==0;
     }
 
 
