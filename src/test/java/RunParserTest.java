@@ -20,8 +20,8 @@ public class RunParserTest extends TestCase{
 
     public void testApp() throws Exception{
 //        String infilepath="/Users/kimm5/_dev/skhynix/rawdata/rawdata.txt";
-        String infilepath="/Users/kimm5/_dev/DramParser/src/test/resources/testdata/rawdata.txt2";
-        String outdirpath="/Users/kimm5/_dev/DramParser/src/test/resources/out2";
+        String infilepath="/Users/kimm5/_dev/DramParser/src/test/data/testdata/rawdata.txt2";
+        String outdirpath="/Users/kimm5/_dev/DramParser/src/test/data/out2";
         new CommandParser(infilepath,outdirpath, "csv").execute();
     }
 

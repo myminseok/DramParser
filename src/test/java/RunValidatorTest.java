@@ -101,8 +101,8 @@ public class RunValidatorTest extends TestCase {
 
 
     public void testApp() throws Exception{
-        infilepath="/Users/kimm5/_dev/DramParser/src/test/resources/out2/rawdata.txt.unique";
-        outdirpath="/Users/kimm5/_dev/DramParser/src/test/resources/out2";
+        infilepath="/Users/kimm5/_dev/DramParser/src/test/data/out2/rawdata.txt.unique";
+        outdirpath="/Users/kimm5/_dev/DramParser/src/test/data/out2";
         outfileextension="csv";
         execute();
     }
