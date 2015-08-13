@@ -1,5 +1,5 @@
 .gradle/
-/target
+**/target/
 **/.idea
 **/log
 .settings
@@ -8,4 +8,8 @@
 .DS_Store
 **/*.class
 /src/test/data/**
+**/*.tar.gz
 
+.idea/*
+*.iml
+**/*.iml
