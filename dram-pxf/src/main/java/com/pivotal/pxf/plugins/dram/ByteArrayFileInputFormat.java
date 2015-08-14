@@ -43,7 +43,7 @@ public class ByteArrayFileInputFormat extends FileInputFormat<Text, BytesWritabl
 		private boolean read = false;
 		private FileSystem fs = null;
 		private FileSplit fSplit = null;
-
+		private String filename=null;
 		FSDataInputStream inStream=null;
 
 		public WholeFileRecordReader(InputSplit split, JobConf conf)
@@ -60,6 +60,8 @@ public class ByteArrayFileInputFormat extends FileInputFormat<Text, BytesWritabl
 
 			// get the bytes of the file for the value
 			inStream = fs.open(fSplit.getPath());
+			filename = fSplit.getPath().getName();
+
 		}
 
 //		@Override
@@ -97,12 +99,7 @@ public class ByteArrayFileInputFormat extends FileInputFormat<Text, BytesWritabl
 				LOG.info("ByteArrayFileInputFormat finish! ");
 				return false;
 			}
-
-			if(inStream==null){
-				inStream = fs.open(fSplit.getPath());
-				LOG.info("ByteArrayFileInputFormat file open... ");
-			}
-			key.set(fs.makeQualified(fSplit.getPath()).toString());
+			key.set(filename);
 
 			try {
 				byte[] buffer = new byte[4];

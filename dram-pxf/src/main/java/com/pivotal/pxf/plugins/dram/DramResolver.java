@@ -1,6 +1,5 @@
 package com.pivotal.pxf.plugins.dram;
 
-import com.pivotal.pxf.PxfUnit;
 import com.pivotal.pxf.api.OneField;
 import com.pivotal.pxf.api.OneRow;
 import com.pivotal.pxf.api.ReadResolver;

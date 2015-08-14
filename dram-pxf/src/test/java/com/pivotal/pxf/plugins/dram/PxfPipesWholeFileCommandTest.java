@@ -16,6 +16,7 @@ import com.pivotal.pxf.api.ReadAccessor;
 import com.pivotal.pxf.api.ReadResolver;
 import com.pivotal.pxf.api.io.DataType;
 
+
 public class PxfPipesWholeFileCommandTest extends PxfUnit {
 
 	private static final Logger LOG = Logger.getLogger(PxfPipesWholeFileCommandTest.class.getName());
