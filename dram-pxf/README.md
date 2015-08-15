@@ -69,6 +69,17 @@ select * from dram group by key, serial,bits order by key, serial limit 100;
 
 ```
 
+drop external table javatest.dram;
+CREATE EXTERNAL TABLE dram ( key TEXT, serial FLOAT, bits TEXT )
+LOCATION ('pxf://phd1.localdomain:51200/dramdata/sampledata/rawdata.txt.sample.0?Profile=Dram')
+FORMAT 'custom' (Formatter='pxfwritable_import');
+
+select count(*) from javatest.dram;
+
+select * from javatest.dram group by key, serial,bits order by key, serial limit 100;
+
+
+
 
 
 ### dumy query
@@ -95,3 +106,4 @@ location
  http://hawq.docs.pivotal.io/docs-hawq/topics/PXFInstallationandAdministration.html
  http://pivotalhd-210.docs.pivotal.io/tutorial/getting-started/dataset.html
  http://pivotalhd-210.docs.pivotal.io/tutorial/getting-started/hawq/pxf-external-tables.html
+

@@ -1,0 +1,6 @@
+
+Name: deployment/examples.ddr
+SQLJDeploymentDescriptor: false
+
+Name: pljava.ddr
+SQLJDeploymentDescriptor: false

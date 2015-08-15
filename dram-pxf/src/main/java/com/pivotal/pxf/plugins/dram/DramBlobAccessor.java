@@ -15,7 +15,7 @@ import com.pivotal.pxf.plugins.hdfs.HdfsSplittableDataAccessor;
  * This accessor, wrapped by PipedAccessor passes the entire contents of
  * the file to the external program. The filename is first passed into the
  * external program, followed by a tab, and then the contents of the file.<br>
- * An example of a Python program to extract pixel RGB values from an image:
+ * An dram of a Python program to extract pixel RGB values from an image:
  *
  * <pre>
  * #!/usr/bin/python

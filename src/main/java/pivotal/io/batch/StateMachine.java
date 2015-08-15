@@ -77,7 +77,10 @@ public class StateMachine {
         stateCommandAllMap.put(StateCommand.type.ZQC, StateCommandZQC.getInstance());
         stateCommandAllMap.put(StateCommand.type.SRE, StateCommandZQC.getInstance());
         stateCommandAllMap.put(StateCommand.type.MRS, StateCommandMRS.getInstance());
+
         stateCommandAllMapKeyset = stateCommandAllMap.keySet();
+        stateCommandAllMapKeyset.remove(StateCommand.type.CKE_L);
+        stateCommandAllMapKeyset.remove(StateCommand.type.UND);
 
     }
 
