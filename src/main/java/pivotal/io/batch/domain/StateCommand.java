@@ -280,12 +280,12 @@ public abstract class StateCommand {
 
     public static String parse(byte[] v){
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("%8s(%s):%2s, ", INDEX.CKE0.name(), INDEX.CKE0.getHumanIndex(), StateCommand.getBit(v, INDEX.CKE0.getBinaryIndex())));
-        sb.append(String.format("%8s(%s):%2s, ", INDEX.CS0.name(), INDEX.CS0.getHumanIndex(), StateCommand.getBit(v, INDEX.CS0.getBinaryIndex())));
-        sb.append(String.format("%8s(%s):%2s, ", INDEX.ACTN.name(), INDEX.ACTN.getHumanIndex(),  StateCommand.getBit(v, INDEX.ACTN.getBinaryIndex())));
-        sb.append(String.format("%8s(%s):%2s, ", INDEX.A16.name(), INDEX.A16.getHumanIndex(), StateCommand.getBit(v, INDEX.A16.getBinaryIndex())));
-        sb.append(String.format("%8s(%s):%2s, ", INDEX.A15.name(), INDEX.A15.getHumanIndex(), StateCommand.getBit(v, INDEX.A15.getBinaryIndex())));
-        sb.append(String.format("%8s(%s):%2s", INDEX.A14.name(), INDEX.A14.getHumanIndex(), StateCommand.getBit(v, INDEX.A14.getBinaryIndex())));
+        sb.append(String.format("%s(%s):%s, ", INDEX.CKE0.name(), INDEX.CKE0.getHumanIndex(), StateCommand.getBit(v, INDEX.CKE0.getBinaryIndex())));
+        sb.append(String.format("%s(%s):%s, ", INDEX.CS0.name(), INDEX.CS0.getHumanIndex(), StateCommand.getBit(v, INDEX.CS0.getBinaryIndex())));
+        sb.append(String.format("%s(%s):%s, ", INDEX.ACTN.name(), INDEX.ACTN.getHumanIndex(),  StateCommand.getBit(v, INDEX.ACTN.getBinaryIndex())));
+        sb.append(String.format("%s(%s):%s, ", INDEX.A16.name(), INDEX.A16.getHumanIndex(), StateCommand.getBit(v, INDEX.A16.getBinaryIndex())));
+        sb.append(String.format("%s(%s):%s, ", INDEX.A15.name(), INDEX.A15.getHumanIndex(), StateCommand.getBit(v, INDEX.A15.getBinaryIndex())));
+        sb.append(String.format("%s(%s):%s", INDEX.A14.name(), INDEX.A14.getHumanIndex(), StateCommand.getBit(v, INDEX.A14.getBinaryIndex())));
         return sb.toString();
 
     }

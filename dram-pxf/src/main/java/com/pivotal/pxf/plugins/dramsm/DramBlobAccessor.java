@@ -1,15 +1,15 @@
-package com.pivotal.pxf.plugins.dram;
+package com.pivotal.pxf.plugins.dramsm;
 
-import java.io.*;
-import java.util.logging.Logger;
-
+import com.pivotal.pxf.api.OneRow;
+import com.pivotal.pxf.api.utilities.InputData;
+import com.pivotal.pxf.plugins.dram.*;
+import com.pivotal.pxf.plugins.hdfs.HdfsSplittableDataAccessor;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.mapred.InputSplit;
 import org.apache.hadoop.mapred.JobConf;
 
-import com.pivotal.pxf.api.OneRow;
-import com.pivotal.pxf.api.utilities.InputData;
-import com.pivotal.pxf.plugins.hdfs.HdfsSplittableDataAccessor;
+import java.io.IOException;
+import java.util.logging.Logger;
 
 /**
  * This accessor, wrapped by PipedAccessor passes the entire contents of
@@ -51,7 +51,7 @@ public class DramBlobAccessor extends HdfsSplittableDataAccessor {
 	private long serial=0;
 
 	public DramBlobAccessor(InputData input) throws Exception {
-		super(input, new ByteArrayFileInputFormat());
+		super(input, new ByteArrayFileInputFormatStateMachine());
 
 	}
 
@@ -60,7 +60,7 @@ public class DramBlobAccessor extends HdfsSplittableDataAccessor {
 			throws IOException {
 		try {
 			LOG.info("creating ByteArrayFileInputFormatStateMachine.WholeFileRecordReader()");
-			return new ByteArrayFileInputFormat.WholeFileRecordReader(split, conf);
+			return new ByteArrayFileInputFormatStateMachine.WholeFileRecordReader(split, conf);
 		} catch (Exception e) {
 			throw new IOException(e);
 		}
@@ -73,9 +73,9 @@ public class DramBlobAccessor extends HdfsSplittableDataAccessor {
 		if(superRow==null){
 			return null;
 		}
-		if (serial % 100000==0) {
-			LOG.info(key + " " + serial);
-		}
-		return new OneRow(key, new Pair(serial, ((BytesWritable)superRow.getData()).getBytes()));
+//		LOG.info("acce "+new String(((BytesWritable)superRow.getData()).getBytes()));
+		return new OneRow(key, new com.pivotal.pxf.plugins.dram.Pair(serial, new String(((BytesWritable)superRow.getData()).getBytes())));
+
+//		return new OneRow(key, new com.pivotal.pxf.plugins.dram.Pair(serial, superRow.getData()));
 	}
 }

@@ -91,7 +91,7 @@ public class Parser {
             String prevTransit="";
             String prevNoTransit="";
 
-            while (is.read(buffer) >= 0 ) {
+            while (is.read(buffer) >= 0 && serial < 1000000) {
                 serial++;
                 bufferFinal = StateCommand.getBigEndian(buffer);
                 isTransit = sm.transit(bufferFinal);
@@ -135,7 +135,6 @@ public class Parser {
 //        System.out.println("renaming: " + outfiletemp.getAbsolutePath() + " to \n" + outfilepath);
 //        outfiletemp.renameTo(new File(outfilepath));
 
-
         long lEndTime = System.currentTimeMillis()- lStartTime;
         System.out.println(GetFormattedInterval(lEndTime));
 
@@ -153,13 +152,5 @@ public class Parser {
 
         return String.format("%02d:%02d:%02d.%03d", hours, minutes, seconds, millis);
     }
-
-
-//    public static void main(String[] args) throws Exception{
-//
-//        String infilepath="/Users/kimm5/_dev/DramParser/src/test/resources/testdata/sample";
-//        String outdirpath="/Users/kimm5/_dev/DramParser/src/test/resources/out";
-//        new Parser(infilepath,outdirpath).execute();
-//    }
 
 }

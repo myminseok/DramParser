@@ -2,24 +2,63 @@
 # PXF mdule for dram test data
 
 # upload pxf module
-on all hawq node, 
+on all hawq node
+
+
 ## copy jar:
 /usr/lib/gphd/pxf/dram-pxf-3.0.0.0-18-SNAPSHOT.jar 
 
+#
+vi /etc/gphd/pxf/conf/pxf-private.classpath
+
+/usr/lib/gphd/pxf/pmr-common-2.0.1.0-1.jar
+/usr/lib/gphd/pxf/dram-pxf-3.0.0.0-18-SNAPSHOT.jar
+/usr/lib/gphd/pxf/springxd-dramparser-1.0.0-SNAPSHOT.jar
+
 ## edit profiles
 vi /etc/gphd/pxf/conf/pxf-profiles.xml
+
 ```
+
 <profile>
-	<name>Dram</name>
-	<description>A profile for PXF Pipes using the entire file as input
-	</description>
-	<plugins>
-		<fragmenter>com.pivotal.pxf.plugins.dram.WholeFileFragmenter</fragmenter>
-		<accessor>com.pivotal.pxf.plugins.dram.DramBlobAccessor</accessor>
-		<resolver>com.pivotal.pxf.plugins.dram.DramResolver</resolver>
-		<linebyline>false</linebyline>
-	</plugins>
+<name>DramWholeFilePipesi2</name>
+<description>A profile for PXF Pipes using the entire file as input
+</description>
+<plugins>
+        <fragmenter>com.pivotal.pxf.plugins.dram.DummyFragmenter</fragmenter>
+        <accessor>com.pivotal.pxf.plugins.dram.DummyAccessor</accessor>
+        <resolver>com.pivotal.pxf.plugins.dram.DummyResolver</resolver>
+        <analyzer>com.pivotal.pxf.plugins.dram.DummyAnalyzer</analyzer>
+        <linebyline>false</linebyline>
+</plugins>
 </profile>
+
+
+<profile>
+        <name>Dram</name>
+        <description>A profile for PXF Pipes using the entire file as input
+        </description>
+        <plugins>
+                <fragmenter>com.pivotal.pxf.plugins.dram.WholeFileFragmenter</fragmenter>
+                <accessor>com.pivotal.pxf.plugins.dram.DramBlobAccessor</accessor>
+                <resolver>com.pivotal.pxf.plugins.dram.DramResolver</resolver>
+                <linebyline>false</linebyline>
+        </plugins>
+</profile>
+
+<profile>
+        <name>dramsm</name>
+        <description>A profile for PXF Pipes using the entire file as input
+        </description>
+        <plugins>
+                <fragmenter>com.pivotal.pxf.plugins.dramsm.WholeFileFragmenter</fragmenter>
+                <accessor>com.pivotal.pxf.plugins.dramsm.DramBlobAccessor</accessor>
+                <resolver>com.pivotal.pxf.plugins.dramsm.DramResolver</resolver>
+                <linebyline>false</linebyline>
+        </plugins>
+</profile>
+
+
 ```
 
 3) restart pxf.
@@ -52,22 +91,40 @@ tail -f /var/gphd/pxf/pxf-service/logs/*
 
 # on hawq master node
 
-## test query
- 
-/usr/local/hawq/bin/psql 
- 
 
-```
-drop external table dram;
+scp root@192.168.55.1:/Users/kimm5/_dev/DramParser/dram-pxf/target/dram-pxf-3.0.0.0-18-SNAPSHOT.jar .
+scp dram-pxf-3.0.0.0-18-SNAPSHOT.jar root@phd1:/usr/lib/gphd/pxf/
+scp dram-pxf-3.0.0.0-18-SNAPSHOT.jar root@phd2:/usr/lib/gphd/pxf/
+
+
+scp root@192.168.55.1:/Users/kimm5/_dev/DramParser/springxd-dramparser/target/springxd-dramparser-1.0.0-SNAPSHOT.jar .
+scp springxd-dramparser-1.0.0-SNAPSHOT.jar root@phd1:/usr/lib/gphd/pxf/
+scp springxd-dramparser-1.0.0-SNAPSHOT.jar root@phd2:/usr/lib/gphd/pxf/
+
+
+scp *.jar root@phd2:/usr/lib/gphd/pxf/
+
+drop external table javatest.dram;
 CREATE EXTERNAL TABLE dram ( key TEXT, serial FLOAT, bits TEXT )
-LOCATION ('pxf://phd1.localdomain:51200/dramdata/sampledata/*?Profile=Dram')
+LOCATION ('pxf://phd1.localdomain:51200/dramdata/sampledata/rawdata.txt.sample.0?Profile=Dram')
 FORMAT 'custom' (Formatter='pxfwritable_import');
 
-select count(*) from dram;
+select count(*) from javatest.dram;
 
-select * from dram group by key, serial,bits order by key, serial limit 100;
+select * from javatest.dram group by key, serial,bits order by key, serial limit 100;
 
-```
+
+
+drop external table javatest.dram;
+CREATE EXTERNAL TABLE dram ( key TEXT, serial FLOAT, bits TEXT )
+LOCATION ('pxf://phd1.localdomain:51200/dramdata/sampledata/rawdata.txt.sample.0?Profile=Dram')
+FORMAT 'custom' (Formatter='pxfwritable_import');
+
+select count(*) from javatest.dram;
+
+select * from javatest.dram group by key, serial,bits order by key, serial limit 100;
+
+
 
 
 
@@ -87,6 +144,58 @@ location
  　
  
  
+ 
+ 
+## test query
+ 
+/usr/local/hawq/bin/psql 
+ 
+
+```
+drop external table dram;
+CREATE EXTERNAL TABLE dram ( key TEXT, serial FLOAT, bits TEXT )
+LOCATION ('pxf://phd1.localdomain:51200/dramdata/sampledata/*?Profile=Dram')
+FORMAT 'custom' (Formatter='pxfwritable_import');
+
+select count(*) from dram;
+
+select * from dram group by key, serial,bits order by key, serial limit 100;
+
+```
+
+drop external table javatest.dram;
+CREATE EXTERNAL TABLE dram ( key TEXT, serial FLOAT, bits TEXT )
+LOCATION ('pxf://phd1.localdomain:51200/dramdata/sampledata/rawdata.txt.sample.0?Profile=Dram')
+FORMAT 'custom' (Formatter='pxfwritable_import');
+
+
+drop external table javatest.dramsm;
+CREATE EXTERNAL TABLE javatest.dramsm ( file TEXT, serial FLOAT, result TEXT )
+LOCATION ('pxf://phd1.localdomain:51200/dramdata/sampledata/rawdata.txt.sample.0?FRAGMENTER=com.pivotal.pxf.plugins.dramsm.WholeFileFragmenter&ACCESSOR=com.pivotal.pxf.plugins.dramsm.DramBlobAccessor&RESOLVER=com.pivotal.pxf.plugins.dramsm.DramResolver')
+FORMAT 'custom' (Formatter='pxfwritable_import');
+
+
+drop external table javatest.dramsm;
+CREATE EXTERNAL TABLE javatest.dramsm ( file TEXT, serial FLOAT, result TEXT )
+LOCATION ('pxf://phd1.localdomain:51200/dramdata/sampledata/rawdata.txt.sample.0?Profile=dramsm')
+FORMAT 'custom' (Formatter='pxfwritable_import');
+
+
+drop external table javatest.dramsm;
+CREATE EXTERNAL TABLE javatest.dramsm ( file TEXT, serial FLOAT, result TEXT )
+LOCATION ('pxf://phd1.localdomain:51200/dramdata/testdata/*?Profile=dramsm')
+FORMAT 'custom' (Formatter='pxfwritable_import');
+
+
+
+
+select count(*) from javatest.dram;
+
+select * from javatest.dram group by key, serial,bits order by key, serial limit 100;
+
+
+
+
  # ref
  
  http://pivotal-field-engineering.github.io/pxf-field/index.html
@@ -95,3 +204,4 @@ location
  http://hawq.docs.pivotal.io/docs-hawq/topics/PXFInstallationandAdministration.html
  http://pivotalhd-210.docs.pivotal.io/tutorial/getting-started/dataset.html
  http://pivotalhd-210.docs.pivotal.io/tutorial/getting-started/hawq/pxf-external-tables.html
+

@@ -1,4 +1,4 @@
-package com.pivotal.pxf.plugins.dram;
+package com.pivotal.pxf.plugins.dramsm;
 
 import com.pivotal.pxf.api.OneField;
 import com.pivotal.pxf.api.OneRow;
@@ -6,6 +6,7 @@ import com.pivotal.pxf.api.ReadResolver;
 import com.pivotal.pxf.api.io.DataType;
 import com.pivotal.pxf.api.utilities.InputData;
 import com.pivotal.pxf.api.utilities.Plugin;
+import org.apache.hadoop.io.ByteWritable;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,15 +37,16 @@ public class DramResolver extends Plugin implements ReadResolver {
 				DataType.valueOf(inputData.getColumn(0).columnTypeName().toUpperCase()),
 				paramOneRow.getKey().toString());
 
-		Pair<Long, byte[]> data = (Pair<Long, byte[]>)paramOneRow.getData();
+		com.pivotal.pxf.plugins.dram.Pair<Long, String> data = (com.pivotal.pxf.plugins.dram.Pair<Long, String>)paramOneRow.getData();
 
+//		LOG.info("DramResolver1"+data.second);
 		//serial
 		addFieldFromString(
 				DataType.valueOf(inputData.getColumn(1).columnTypeName().toUpperCase()), String.valueOf(data.first));
 
-		// data byte[]
+		// result String
 		addFieldFromString(
-				DataType.valueOf(inputData.getColumn(2).columnTypeName().toUpperCase()), Utils.byteToBits(data.second));
+				DataType.valueOf(inputData.getColumn(2).columnTypeName().toUpperCase()), data.second);
 
 		return fields;
 	}
@@ -91,7 +93,24 @@ public class DramResolver extends Plugin implements ReadResolver {
 			}
 		}
 
-		//LOG.info("oneField type:"+oneField.type);
+		fields.add(oneField);
+	}
+
+	private void addFieldFromLong(DataType type, Long val)
+			throws IOException {
+		OneField oneField = new OneField();
+		oneField.type = type.getOID();
+		oneField.val= val;
+		fields.add(oneField);
+	}
+
+
+
+	private void addFieldFromByte(DataType type, byte[] val)
+			throws IOException {
+		OneField oneField = new OneField();
+		oneField.type = type.getOID();
+		oneField.val= val;
 		fields.add(oneField);
 	}
 }

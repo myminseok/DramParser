@@ -25,8 +25,8 @@ public class StateInfo {
     public String toStringHeader(boolean isTransit){
         StringBuilder sb = new StringBuilder();
         if(isTransit) {
-            sb.append("prevState,\t");
-            sb.append("newCommand,\t");
+            sb.append("prevState, ");
+            sb.append("newCommand, ");
             sb.append("currentState");
             return sb.toString();
         } else {
@@ -37,8 +37,8 @@ public class StateInfo {
     public String toString(){
         StringBuilder sb = new StringBuilder();
         if(isTransit) {
-            sb.append(prevState == null ? "" : prevState.getName()).append(",\t");
-            sb.append((newCommand == null ? "" : newCommand.getName())).append(",\t");
+            sb.append(prevState == null ? "" : prevState.getName()).append(", ");
+            sb.append((newCommand == null ? "" : newCommand.getName())).append(", ");
 //            sb.append(newData == null ? "" : StateCommand.byteToBits(newData)).append(",\t");
             sb.append(currentState == null ? "" : currentState.getName());
             return sb.toString();
