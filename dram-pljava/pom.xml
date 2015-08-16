@@ -2,13 +2,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-
 	<version>0.1-SNAPSHOT</version>
 	<groupId>org.postgresql</groupId>
 	<artifactId>dram-pljava</artifactId>
 	<name>dram-pljava</name>
-
-
 
 	<!--<parent>-->
 		<!--<groupId>org.postgresql</groupId>-->
@@ -18,13 +15,19 @@
 	<!--</parent>-->
 
 	<description>Examples of java stored procedures</description>
-	<!--<dependencies>-->
+	<dependencies>
 		<!--<dependency>-->
 			<!--<groupId>org.postgresql</groupId>-->
 			<!--<artifactId>pljava-api</artifactId>-->
 			<!--<version>0.0.2-SNAPSHOT</version>-->
 		<!--</dependency>-->
-	<!--</dependencies>-->
+		<dependency>
+			<groupId>pivotal.io.batch</groupId>
+			<artifactId>springxd-dramparser</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+
 	<build>
 		<plugins>
 			<plugin>

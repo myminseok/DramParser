@@ -4,10 +4,10 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>pivotal.io.batch</groupId>
-	<artifactId>dram-module</artifactId>
-	<version>1.0.0</version>
-	<name></name>
-	<packaging>pom</packaging>
+	<artifactId>springxd-dramparser</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<name>e</name>
+	<packaging>jar</packaging>
 	<description>
 	</description>
 
@@ -15,13 +15,12 @@
 		<maven>2.2.1</maven>
 	</prerequisites>
 
-	<modules>
-		<module>springxd-dramparser</module>
-		<module>dram-pljava</module>
-		<module>dram-pxf</module>
-	</modules>
-
-
+	<parent>
+		<groupId>org.springframework.xd.samples</groupId>
+		<artifactId>sample-modules-parent</artifactId>
+		<version>1.0.0.BUILD-SNAPSHOT</version>
+		<relativePath>../sample-modules-parent</relativePath>
+	</parent>
 
 
 </project>

@@ -7,14 +7,8 @@
 .project
 .DS_Store
 **/*.class
-/src/test/data/**
-<<<<<<< HEAD
-/springxd-dramparser/src/test/data/**
-=======
-springxd-dramparser/src/test/data/**
->>>>>>> a375948... remote data
+**/src/test/data/**
 **/*.tar.gz
-
 .idea/*
 *.iml
 **/*.iml

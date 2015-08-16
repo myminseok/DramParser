@@ -1,11 +1,9 @@
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import junit.framework.TestCase;
 import pivotal.io.batch.StateMachine;
 import pivotal.io.batch.domain.State;
 import pivotal.io.batch.domain.*;
 
-/**
- * Created by kimm5 on 8/1/15.
- */
 public class StateTest extends TestCase{
 
 
@@ -14,9 +12,10 @@ public class StateTest extends TestCase{
         super( testName );
     }
 
+    public void testBitSetGet(){
+    }
 
-
-    public void testTransit()
+    public void ignoretestTransit()
     {
         byte[] data = null;
         StateCommand cmd=null;

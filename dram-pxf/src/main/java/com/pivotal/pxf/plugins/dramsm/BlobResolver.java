@@ -6,7 +6,7 @@ import com.pivotal.pxf.api.ReadResolver;
 import com.pivotal.pxf.api.io.DataType;
 import com.pivotal.pxf.api.utilities.InputData;
 import com.pivotal.pxf.api.utilities.Plugin;
-import org.apache.hadoop.io.ByteWritable;
+import com.pivotal.pxf.plugins.Pair;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,12 +19,12 @@ import java.util.logging.Logger;
  * 
  * It will also write key value pairs to a specific hash.
  */
-public class DramResolver extends Plugin implements ReadResolver {
-	private static final Logger LOG = Logger.getLogger(com.pivotal.pxf.plugins.dramsm.DramResolver.class.getName());
+public class BlobResolver extends Plugin implements ReadResolver {
+	private static final Logger LOG = Logger.getLogger(BlobResolver.class.getName());
 
 	private ArrayList<OneField> fields = new ArrayList<OneField>();
 
-	public DramResolver(InputData inputData) throws Exception {
+	public BlobResolver(InputData inputData) throws Exception {
 		super(inputData);
 	}
 
@@ -37,10 +37,9 @@ public class DramResolver extends Plugin implements ReadResolver {
 				DataType.valueOf(inputData.getColumn(0).columnTypeName().toUpperCase()),
 				paramOneRow.getKey().toString());
 
-		com.pivotal.pxf.plugins.dram.Pair<Long, String> data = (com.pivotal.pxf.plugins.dram.Pair<Long, String>)paramOneRow.getData();
+		Pair<Long, String> data = (com.pivotal.pxf.plugins.Pair<Long, String>)paramOneRow.getData();
 
-//		LOG.info("DramResolver1"+data.second);
-		//serial
+		//result serial
 		addFieldFromString(
 				DataType.valueOf(inputData.getColumn(1).columnTypeName().toUpperCase()), String.valueOf(data.first));
 

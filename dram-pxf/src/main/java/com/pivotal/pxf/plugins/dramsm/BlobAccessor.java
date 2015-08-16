@@ -2,7 +2,6 @@ package com.pivotal.pxf.plugins.dramsm;
 
 import com.pivotal.pxf.api.OneRow;
 import com.pivotal.pxf.api.utilities.InputData;
-import com.pivotal.pxf.plugins.dram.*;
 import com.pivotal.pxf.plugins.hdfs.HdfsSplittableDataAccessor;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.mapred.InputSplit;
@@ -45,13 +44,13 @@ import java.util.logging.Logger;
  * sys.exit(0)
  * </pre>
  */
-public class DramBlobAccessor extends HdfsSplittableDataAccessor {
-	private static final Logger LOG = Logger.getLogger(DramBlobAccessor.class.getName());
+public class BlobAccessor extends HdfsSplittableDataAccessor {
+	private static final Logger LOG = Logger.getLogger(BlobAccessor.class.getName());
 
 	private long serial=0;
 
-	public DramBlobAccessor(InputData input) throws Exception {
-		super(input, new ByteArrayFileInputFormatStateMachine());
+	public BlobAccessor(InputData input) throws Exception {
+		super(input, new BlobFileInputFormatWithStateMachine());
 
 	}
 
@@ -59,8 +58,8 @@ public class DramBlobAccessor extends HdfsSplittableDataAccessor {
 	protected Object getReader(JobConf conf, InputSplit split)
 			throws IOException {
 		try {
-			LOG.info("creating ByteArrayFileInputFormatStateMachine.WholeFileRecordReader()");
-			return new ByteArrayFileInputFormatStateMachine.WholeFileRecordReader(split, conf);
+			LOG.info("creating BlobFileInputFormatWithStateMachine.WholeFileRecordReader()");
+			return new BlobFileInputFormatWithStateMachine.WholeFileRecordReader(split, conf);
 		} catch (Exception e) {
 			throw new IOException(e);
 		}
@@ -74,8 +73,8 @@ public class DramBlobAccessor extends HdfsSplittableDataAccessor {
 			return null;
 		}
 //		LOG.info("acce "+new String(((BytesWritable)superRow.getData()).getBytes()));
-		return new OneRow(key, new com.pivotal.pxf.plugins.dram.Pair(serial, new String(((BytesWritable)superRow.getData()).getBytes())));
+		return new OneRow(key, new com.pivotal.pxf.plugins.Pair(serial, new String(((BytesWritable)superRow.getData()).getBytes())));
 
-//		return new OneRow(key, new com.pivotal.pxf.plugins.dram.Pair(serial, superRow.getData()));
+//		return new OneRow(key, new com.pivotal.pxf.plugins.Pair(serial, superRow.getData()));
 	}
 }

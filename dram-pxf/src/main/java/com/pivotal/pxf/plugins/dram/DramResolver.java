@@ -6,6 +6,8 @@ import com.pivotal.pxf.api.ReadResolver;
 import com.pivotal.pxf.api.io.DataType;
 import com.pivotal.pxf.api.utilities.InputData;
 import com.pivotal.pxf.api.utilities.Plugin;
+import com.pivotal.pxf.plugins.Pair;
+import com.pivotal.pxf.plugins.dramsm.BlobResolver;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,7 +21,7 @@ import java.util.logging.Logger;
  * It will also write key value pairs to a specific hash.
  */
 public class DramResolver extends Plugin implements ReadResolver {
-	private static final Logger LOG = Logger.getLogger(com.pivotal.pxf.plugins.dramsm.DramResolver.class.getName());
+	private static final Logger LOG = Logger.getLogger(BlobResolver.class.getName());
 
 	private ArrayList<OneField> fields = new ArrayList<OneField>();
 
@@ -39,12 +41,12 @@ public class DramResolver extends Plugin implements ReadResolver {
 		Pair<Long, byte[]> data = (Pair<Long, byte[]>)paramOneRow.getData();
 
 		//serial
-		addFieldFromString(
-				DataType.valueOf(inputData.getColumn(1).columnTypeName().toUpperCase()), String.valueOf(data.first));
+		addFieldFromLong(
+				DataType.valueOf(inputData.getColumn(1).columnTypeName().toUpperCase()), data.first);
 
 		// data byte[]
-		addFieldFromString(
-				DataType.valueOf(inputData.getColumn(2).columnTypeName().toUpperCase()), Utils.byteToBits(data.second));
+		addFieldFromByte(
+				DataType.valueOf(inputData.getColumn(2).columnTypeName().toUpperCase()), data.second);
 
 		return fields;
 	}
@@ -91,7 +93,24 @@ public class DramResolver extends Plugin implements ReadResolver {
 			}
 		}
 
-		//LOG.info("oneField type:"+oneField.type);
+		fields.add(oneField);
+	}
+
+	private void addFieldFromLong(DataType type, Long val)
+			throws IOException {
+		OneField oneField = new OneField();
+		oneField.type = type.getOID();
+		oneField.val= val;
+		fields.add(oneField);
+	}
+
+
+
+	private void addFieldFromByte(DataType type, byte[] val)
+			throws IOException {
+		OneField oneField = new OneField();
+		oneField.type = type.getOID();
+		oneField.val= val;
 		fields.add(oneField);
 	}
 }

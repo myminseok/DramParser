@@ -1,10 +1,12 @@
 package com.pivotal.pxf.plugins.dram;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
 import com.pivotal.pxf.api.utilities.InputData;
+import com.pivotal.pxf.plugins.dramsm.BlobResolver;
 import org.apache.hadoop.fs.Path;
 import org.junit.After;
 import org.junit.Before;
@@ -26,9 +28,9 @@ public class PxfPipesWholeFileCommandTest extends PxfUnit {
 
 	static {
 		columnDefs = new ArrayList<Pair<String, DataType>>();
-		columnDefs.add(new Pair<String, DataType>("key", DataType.TEXT));
+		columnDefs.add(new Pair<String, DataType>("file", DataType.TEXT));
 		columnDefs.add(new Pair<String, DataType>("serial", DataType.BIGINT));
-		columnDefs.add(new Pair<String, DataType>("bits", DataType.TEXT));
+		columnDefs.add(new Pair<String, DataType>("bits", DataType.BYTEA));
 	}
 
 	@Before
@@ -50,7 +52,7 @@ public class PxfPipesWholeFileCommandTest extends PxfUnit {
 	public void testDram() throws Exception {
 
 		setup(new Path(System.getProperty("user.dir")
-				+ "/" + "src/test/resources/dramdata/rawdata.txt.sample.0"));
+				+ File.separator + "src/test/resources/dramdata/rawdata.txt.sample.0"));
 
 		for (InputData data : inputs) {
 			ReadAccessor accessor = getReadAccessor(data);
@@ -80,7 +82,7 @@ public class PxfPipesWholeFileCommandTest extends PxfUnit {
 
 	@Override
 	public Class<? extends ReadResolver> getReadResolverClass() {
-		return com.pivotal.pxf.plugins.dramsm.DramResolver.class;
+		return DramResolver.class;
 	}
 
 	@Override

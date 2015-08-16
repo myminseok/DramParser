@@ -1,5 +1,6 @@
 import junit.framework.TestCase;
 import org.apache.commons.lang.StringUtils;
+import org.apache.hadoop.fs.Path;
 import pivotal.io.batch.Parser;
 import pivotal.io.batch.StateMachine;
 import pivotal.io.batch.domain.StateCommand;
@@ -101,8 +102,8 @@ public class RunValidatorTest extends TestCase {
 
 
     public void testApp() throws Exception{
-        infilepath="/Users/kimm5/_dev/DramParser/src/test/data/out/rawdata.txt.unique.csv";
-        outdirpath="/Users/kimm5/_dev/DramParser/src/test/data/out";
+        infilepath=new Path(System.getProperty("user.dir")+ File.separator +"src/test/data/sampledata/rawdata.txt.unique.csv").toString();
+        outdirpath=new Path(System.getProperty("user.dir")+ File.separator +"src/test/data/out").toString();
         outfileextension="csv";
         execute();
     }

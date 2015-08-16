@@ -1,3 +1,4 @@
+import org.apache.hadoop.fs.Path;
 import pivotal.io.batch.domain.StateCommand;
 
 import java.io.*;
@@ -8,8 +9,8 @@ import java.io.*;
 public class DataFileSpliter {
 
     public static void main(String[] args) throws Exception {
-        String infilepath = "/Users/kimm5/_dev/DramParser/src/test/data/testdata/rawdata.txt";
-        String outdirpath = "/Users/kimm5/_dev/DramParser/src/test/data/out";
+        String infilepath=new Path(System.getProperty("user.dir")+ File.separator +"src/test/data/sampledata/rawdata.txt.sample.0").toString();
+        String outdirpath=new Path(System.getProperty("user.dir")+ File.separator +"src/test/data/out").toString();
         Parser parser = new Parser(infilepath, outdirpath, "csv");
         parser.execute();
     }

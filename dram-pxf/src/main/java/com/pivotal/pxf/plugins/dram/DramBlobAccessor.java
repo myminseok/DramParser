@@ -3,6 +3,7 @@ package com.pivotal.pxf.plugins.dram;
 import java.io.*;
 import java.util.logging.Logger;
 
+import com.pivotal.pxf.plugins.Pair;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.mapred.InputSplit;
 import org.apache.hadoop.mapred.JobConf;
@@ -59,7 +60,7 @@ public class DramBlobAccessor extends HdfsSplittableDataAccessor {
 	protected Object getReader(JobConf conf, InputSplit split)
 			throws IOException {
 		try {
-			LOG.info("creating ByteArrayFileInputFormatStateMachine.WholeFileRecordReader()");
+			LOG.info("creating BlobFileInputFormatWithStateMachine.WholeFileRecordReader()");
 			return new ByteArrayFileInputFormat.WholeFileRecordReader(split, conf);
 		} catch (Exception e) {
 			throw new IOException(e);

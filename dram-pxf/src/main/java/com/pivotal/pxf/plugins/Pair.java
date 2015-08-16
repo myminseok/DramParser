@@ -1,4 +1,4 @@
-package com.pivotal.pxf.plugins.dramsm;
+package com.pivotal.pxf.plugins;
 
 public class Pair<FIRST, SECOND> {
 

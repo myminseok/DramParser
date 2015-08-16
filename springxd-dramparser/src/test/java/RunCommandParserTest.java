@@ -1,4 +1,5 @@
 import junit.framework.TestCase;
+import org.apache.hadoop.fs.Path;
 import pivotal.io.batch.Parser;
 import pivotal.io.batch.StateMachine;
 import pivotal.io.batch.domain.*;
@@ -19,8 +20,8 @@ public class RunCommandParserTest extends TestCase{
     }
 
     public void testApp() throws Exception{
-        String infilepath="/Users/kimm5/_dev/DramParser/src/test/data/testdata/rawdata.txt";
-        String outdirpath="/Users/kimm5/_dev/DramParser/src/test/data/out";
+        String infilepath=new Path(System.getProperty("user.dir")+ File.separator +"src/test/data/sampledata/rawdata.txt.sample.0").toString();
+        String outdirpath=new Path(System.getProperty("user.dir")+ File.separator +"src/test/data/out").toString();
         new CommandParser(infilepath,outdirpath, "csv").execute();
     }
 

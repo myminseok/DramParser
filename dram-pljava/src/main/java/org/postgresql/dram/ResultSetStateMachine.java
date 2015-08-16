@@ -12,20 +12,29 @@
  */
 package org.postgresql.dram;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
+import pivotal.io.batch.StateMachine;
+import pivotal.io.batch.domain.StateCommand;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Filip Hrbek
  */
 public class ResultSetStateMachine {
+
+	private static Logger logger=Logger.getAnonymousLogger();
+
+	int fetchSize=10000;
+
 	public static Iterator<String> executeSelect(String selectSQL) throws SQLException {
+
 		if (!selectSQL.toUpperCase().trim().startsWith("SELECT ")) {
 			throw new SQLException("Not a SELECT statement");
 		}
@@ -34,48 +43,80 @@ public class ResultSetStateMachine {
 	}
 
 	private ArrayList<String> m_results;
-	private long serial=0;
+	PreparedStatement stmt=null;
 
 	public ResultSetStateMachine(String selectSQL) throws SQLException {
-		Connection conn = DriverManager
-				.getConnection("jdbc:default:connection");
+
 		m_results = new ArrayList<String>();
-		StringBuffer result;
 
-		Statement stmt = conn.createStatement();
-		ResultSet rs = stmt.executeQuery(selectSQL);
-		ResultSetMetaData rsmd = rs.getMetaData();
+		Connection conn = DriverManager.getConnection("jdbc:default:connection");
+		logger.info("autoCommit\t" + conn.getAutoCommit());
+		logger.warning("fetchSize\t" + fetchSize);
 
-		int cnt = rsmd.getColumnCount();
-		result = new StringBuffer();
-		for (int i = 1; i <= cnt; i++) {
-			result.append((rsmd.getColumnName(i) + "("
-					+ rsmd.getColumnClassName(i) + ")").replaceAll("(\\\\|;)",
-					"\\$1") + ";;");
-		}
-		m_results.add(result.toString());
+		stmt = conn.prepareStatement(selectSQL, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+		stmt.setFetchSize(fetchSize);
+		ResultSet rs = stmt.executeQuery();
 
+
+		StateMachine sm = new StateMachine();
+		boolean isTransit = false;
+		String prevTransit="";
+		String prevNoTransit="";
+		String bigHex="";
+		String bits="";
+		String parsed="";
+		byte[] buffer;
+		double currSerial;
+		logger.warning("running\t" + selectSQL);
 		while (rs.next()) {
-			serial++;
-			result = new StringBuffer();
-			Object rsObject = null;
-			for (int i = 1; i <= cnt; i++) {
-				rsObject = rs.getObject(i);
-				if (rsObject == null) {
-					rsObject = "<NULL>";
+
+			currSerial = (Double)rs.getObject(2);
+			buffer=(byte[]) rs.getObject(3);
+
+			if( (currSerial % 1000000)==0){
+				logger.warning("serial: " + currSerial);
+			}
+
+			bigHex = StateCommand.bytesToHex(buffer);
+			bits = StateCommand.byteToBits(buffer);
+			parsed = StateCommand.parse(buffer);
+
+			String result;
+			isTransit = sm.transit(buffer);
+			if(isTransit){
+				if(prevTransit.equals(bigHex)){ // prevent dup
+					continue;
 				}
-				result.append(rsObject.toString()
-						.replaceAll("(\\\\|;)", "\\$1") + ";");
+				result = String.format("%5s, %10s, %30s, %s, %s\n", isTransit, currSerial, sm, bits, parsed);
+				prevTransit=bigHex;
+
+			}else{
+				if(prevNoTransit.equals(bigHex)){// prevent dup
+					continue;
+				}
+//				result = String.format("invalid %10s, %15s, %15s, %s, %s\n", serial, sm, sm.getStateCommandType(buffer), bits, parsed);
+				result = String.format("%5s, %10s, %30s, %s, %s\n", isTransit, currSerial, sm, bits, parsed);
+				prevNoTransit=bigHex;
+
 			}
-			if(serial % 100000==0){
-				System.out.println("debug "+result.toString());
-			}
-			m_results.add(result.toString());
+
+			m_results.add(result);
+
 		}
 		rs.close();
 	}
 
+
 	public void close() {
+		if(stmt!=null) {
+			try {
+				stmt.close();
+				logger.warning("stmt.close");
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
 	}
 
 	private Iterator<String> iterator() {

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 import com.gopivotal.mapred.input.CombineWholeFileInputFormat;
+import com.pivotal.pxf.plugins.Utils;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -45,6 +46,7 @@ public class ByteArrayFileInputFormat extends FileInputFormat<Text, BytesWritabl
 		private FileSplit fSplit = null;
 		private String filename=null;
 		FSDataInputStream inStream=null;
+		byte[] buffer = new byte[4];
 
 		public WholeFileRecordReader(InputSplit split, JobConf conf)
 				throws IOException {
@@ -64,50 +66,17 @@ public class ByteArrayFileInputFormat extends FileInputFormat<Text, BytesWritabl
 
 		}
 
-//		@Override
-//		public boolean next(Text key, BytesWritable value) throws IOException {
-//			if (!read) {
-//
-//				// set the key to the fully qualified path
-//				key.set(fs.makeQualified(fSplit.getPath()).toString());
-//
-//				int length = (int) fSplit.getLength();
-//
-//				byte[] bytes = new byte[length];
-//
-//				// get the bytes of the file for the value
-//				FSDataInputStream inStream = fs.open(fSplit.getPath());
-//
-//				IOUtils.readFully(inStream, bytes, 0, length);
-//				inStream.close();
-//
-//				// set the value to the byte array
-//				value.set(bytes, 0, bytes.length);
-//
-//				read = true;
-//				return true;
-//			} else {
-//				return false;
-//			}
-//		}
-
-
 		@Override
 		public boolean next(Text key, BytesWritable value) throws IOException {
 
 			if (read) {
-				LOG.info("ByteArrayFileInputFormatStateMachine finish! ");
+				LOG.info("BlobFileInputFormatWithStateMachine finish! ");
 				return false;
 			}
 			key.set(filename);
-
 			try {
-				byte[] buffer = new byte[4];
-				byte[] bufferFinal;
 				if (inStream.read(buffer) >= 0 ) {
-					bufferFinal = Utils.getBigEndian(buffer);
-					value.set(bufferFinal, 0, bufferFinal.length);
-
+					value.set(Utils.getBigEndian(buffer), 0, 4);
 				}else{
 					read=true;
 				}

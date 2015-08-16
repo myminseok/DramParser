@@ -1,12 +1,18 @@
 package com.pivotal.pxf.plugins.dramsm;
 
 import com.gopivotal.mapred.input.CombineWholeFileInputFormat;
+import com.pivotal.pxf.plugins.Utils;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.*;
+import org.apache.hadoop.mapred.FileInputFormat;
+import org.apache.hadoop.mapred.FileSplit;
+import org.apache.hadoop.mapred.InputSplit;
+import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapred.RecordReader;
+import org.apache.hadoop.mapred.Reporter;
 import pivotal.io.batch.StateMachine;
 import pivotal.io.batch.domain.StateCommand;
 
@@ -19,9 +25,9 @@ import java.util.logging.Logger;
  * the {@link CombineWholeFileInputFormat} could be used to batch them together
  * into a configurable number of map tasks.
  */
-public class ByteArrayFileInputFormatStateMachine extends FileInputFormat<Text, BytesWritable> {
+public class BlobFileInputFormatWithStateMachine extends FileInputFormat<Text, BytesWritable> {
 
-	private static final Logger LOG = Logger.getLogger(ByteArrayFileInputFormatStateMachine.class.getName());
+	private static final Logger LOG = Logger.getLogger(BlobFileInputFormatWithStateMachine.class.getName());
 
 	@Override
 	protected boolean isSplitable(FileSystem fs, Path filename) {
@@ -34,8 +40,7 @@ public class ByteArrayFileInputFormatStateMachine extends FileInputFormat<Text, 
 		return new WholeFileRecordReader(split, conf);
 	}
 
-	public static class WholeFileRecordReader implements
-			RecordReader<Text, BytesWritable> {
+	public static class WholeFileRecordReader implements RecordReader<Text, BytesWritable> {
 
 		private boolean readComplete = false;
 		private FileSystem fs = null;
@@ -62,19 +67,18 @@ public class ByteArrayFileInputFormatStateMachine extends FileInputFormat<Text, 
 
 		}
 
-		StateMachine sm = new StateMachine();
-
-		String prevHex="";
-		String bigHex="";
-		String bits="";
-		String parsed="";
+		private StateMachine sm = new StateMachine();
+		private String prevHex="";
+		private String bigHex="";
+		private String bits="";
+		private String parsed="";
 		private long itemSerial=0;
 
 		@Override
 		public boolean next(Text key, BytesWritable value) throws IOException {
 
 			if (readComplete) {
-				LOG.info("ByteArrayFileInputFormatStateMachine finish! ");
+				LOG.info("BlobFileInputFormatWithStateMachine finish! ");
 				return false;
 			}
 			key.set(filename);
@@ -88,11 +92,11 @@ public class ByteArrayFileInputFormatStateMachine extends FileInputFormat<Text, 
 					if (itemSerial % 100000==0) {
 						LOG.info(String.format("%s, %s", filename, itemSerial));
 					}
+
 					String result = process(buffer);
 					if (result == null) {
 						continue;
 					}
-//					value=new BytesWritable(result.getBytes());
 					value.set(result.getBytes(), 0, result.getBytes().length);
 //					LOG.info("format: "+new String(value.getBytes()));
 					return true;
@@ -118,7 +122,6 @@ public class ByteArrayFileInputFormatStateMachine extends FileInputFormat<Text, 
 			prevHex=bigHex;
 			boolean isTransit = sm.transit(buffer);
 
-//			return String.format("%30s, %5s, %10s, %15s, %s, %s", sm, isTransit, itemSerial, sm.getStateCommandType(buffer), bits, parsed);
 			return String.format("%s, %s, %s, %s, %s", sm, isTransit, itemSerial, bits, parsed);
 		}
 

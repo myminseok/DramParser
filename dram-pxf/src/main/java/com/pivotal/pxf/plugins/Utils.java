@@ -1,4 +1,4 @@
-package com.pivotal.pxf.plugins.dramsm;
+package com.pivotal.pxf.plugins;
 
 /**
  * Created by kimm5 on 8/13/15.

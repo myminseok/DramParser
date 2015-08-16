@@ -1,4 +1,4 @@
-package com.pivotal.pxf.plugins.dram;
+package com.pivotal.pxf.plugins.dramsm;
 
 import com.pivotal.pxf.PxfUnit;
 import com.pivotal.pxf.api.Fragmenter;
@@ -69,12 +69,12 @@ public class PxfPipesWholeFileCommandSMTest extends PxfUnit {
 
 	@Override
 	public Class<? extends ReadAccessor> getReadAccessorClass() {
-		return com.pivotal.pxf.plugins.dramsm.DramBlobAccessor.class;
+		return BlobAccessor.class;
 	}
 
 	@Override
 	public Class<? extends ReadResolver> getReadResolverClass() {
-		return com.pivotal.pxf.plugins.dramsm.DramResolver.class;
+		return BlobResolver.class;
 	}
 
 	@Override

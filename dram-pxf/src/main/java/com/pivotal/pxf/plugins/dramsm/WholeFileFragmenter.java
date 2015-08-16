@@ -30,7 +30,7 @@ public class 	WholeFileFragmenter extends Fragmenter {
 
 		inputPath = new Path(data.getDataSource());
 		LOG.info("inputPath:"+inputPath);
-		format = new ByteArrayFileInputFormatStateMachine();
+		format = new BlobFileInputFormatWithStateMachine();
 	}
 
 	@Override
