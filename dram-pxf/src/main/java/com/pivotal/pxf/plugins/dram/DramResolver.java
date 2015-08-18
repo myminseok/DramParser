@@ -41,8 +41,8 @@ public class DramResolver extends Plugin implements ReadResolver {
 		Pair<Long, byte[]> data = (Pair<Long, byte[]>)paramOneRow.getData();
 
 		//serial
-		addFieldFromLong(
-				DataType.valueOf(inputData.getColumn(1).columnTypeName().toUpperCase()), data.first);
+		addFieldFromString(
+				DataType.valueOf(inputData.getColumn(1).columnTypeName().toUpperCase()), String.valueOf(data.first));
 
 		// data byte[]
 		addFieldFromByte(
