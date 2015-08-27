@@ -1,20 +1,20 @@
-package pivotal.io.batch.domain;
+package pivotal.io.batch.command;
 
 /**
 
  */
-public class StateCommandZQC extends StateCommand{
+public class CommandZQC extends Command {
 
-    public static StateCommand instance=null;
+    public static Command instance=null;
 
-    public static StateCommand getInstance(){
+    public static Command getInstance(){
         if(instance==null){
-            instance= new StateCommandZQC();
+            instance= new CommandZQC();
         }
         return instance;
     }
 
-    public StateCommandZQC(){
+    public CommandZQC(){
         this.name= type.ZQC;
 
     }

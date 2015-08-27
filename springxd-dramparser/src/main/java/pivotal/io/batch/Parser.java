@@ -1,7 +1,8 @@
 package pivotal.io.batch;
 
-import pivotal.io.batch.domain.StateCommand;
-import pivotal.io.batch.domain.StateCommandUndefined;
+import pivotal.io.batch.command.Command;
+import pivotal.io.batch.command.CommandUndefined;
+import pivotal.io.batch.state.StateMachine;
 
 import java.io.*;
 import java.util.HashMap;
@@ -26,7 +27,7 @@ public class Parser {
         sboTransit.append("serial,");
         sboTransit.append(sm.stateInfo.toStringHeader(true)).append(",");
         sboTransit.append("bits,");
-        sboTransit.append(StateCommand.parseHeader()+",");
+        sboTransit.append(Command.parseHeader()+",");
         sboTransit.append("isTransit");
         sboTransit.append("\n");
         out.write(sboTransit.toString());
@@ -37,7 +38,7 @@ public class Parser {
         sb.append(sm.stateInfo.toStringHeader(false)).append(",");
         sb.append("cmd,");
         sb.append("bits,");
-        sb.append(StateCommand.parseHeader());
+        sb.append(Command.parseHeader());
         sb.append("\n");
         out.write(sb.toString());
     }
@@ -82,23 +83,23 @@ public class Parser {
             printHeaderTransit(sm,oTransit );
             printHeaderInvalid(sm,oinvalid);
 
-            StateCommand command;
-            StateCommand prevCmd=null;
-            StateCommand undefinedCmd=StateCommandUndefined.getInstance();
+            Command command;
+            Command prevCmd=null;
+            Command undefinedCmd= CommandUndefined.getInstance();
 //            while (is.read(bufferFinal) >= 0 && serial < 1000000) {
             while (is.read(bufferFinal) >= 0 ) {
                 serial++;
                 if(serial % 100000==0) {
                     System.out.println("serial: "+serial);
                 }
-//                bufferFinal = StateCommand.getBigEndian(buffer);
+//                bufferFinal = Command.getBigEndian(buffer);
                 if(sm.isIgnoreCommand(bufferFinal)){
                     continue;
                 }
                 isTransit = sm.transit(bufferFinal);
-                bits = StateCommand.byteToBits(bufferFinal);
-                bigHex = StateCommand.bytesToHex(bufferFinal);
-                parsed = StateCommand.parse(bufferFinal);
+                bits = Command.byteToBits(bufferFinal);
+                bigHex = Command.bytesToHex(bufferFinal);
+                parsed = Command.parse(bufferFinal);
                 command= sm.getTrialValueHolder().triedCommand;
                 if(undefinedCmd.equals(command)){
                     oinvalid.write(String.format("%10s, %s, %s,  %s, %s\n", serial, sm, sm.findStateCommand(bufferFinal).getName(), bits, parsed));

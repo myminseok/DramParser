@@ -1,20 +1,20 @@
-package pivotal.io.batch.domain;
+package pivotal.io.batch.command;
 
 /**
 
  */
-public class StateCommandACT extends StateCommand{
+public class CommandACT extends Command {
 
-    public static StateCommand instance=null;
+    public static Command instance=null;
 
-    public static StateCommand getInstance(){
+    public static Command getInstance(){
         if(instance==null){
-            instance= new StateCommandACT();
+            instance= new CommandACT();
         }
         return instance;
     }
 
-    public StateCommandACT(){
+    public CommandACT(){
         this.name= type.ACT;
 
     }

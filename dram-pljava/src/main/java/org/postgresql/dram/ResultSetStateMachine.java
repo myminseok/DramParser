@@ -12,16 +12,12 @@
  */
 package org.postgresql.dram;
 
-import pivotal.io.batch.StateMachine;
-import pivotal.io.batch.domain.StateCommand;
+import pivotal.io.batch.state.StateMachine;
+import pivotal.io.batch.command.Command;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -77,9 +73,9 @@ public class ResultSetStateMachine {
 				logger.warning("serial: " + currSerial);
 			}
 
-			bigHex = StateCommand.bytesToHex(buffer);
-			bits = StateCommand.byteToBits(buffer);
-			parsed = StateCommand.parse(buffer);
+			bigHex = Command.bytesToHex(buffer);
+			bits = Command.byteToBits(buffer);
+			parsed = Command.parse(buffer);
 
 			String result;
 			isTransit = sm.transit(buffer);

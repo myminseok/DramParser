@@ -1,5 +1,7 @@
-package pivotal.io.batch.domain;
+package pivotal.io.batch.state;
 
+
+import pivotal.io.batch.command.Command;
 
 public class StateActivePowerDown extends State{
 
@@ -17,8 +19,8 @@ public class StateActivePowerDown extends State{
     }
 
     public void initValidTransitMap(){
-        validTransitMap.put(StateCommand.type.CKE_L, type.ActivePowerDown);
-        validTransitMap.put(StateCommand.type.PDX, type.BankActive);
+        validTransitMap.put(Command.type.CKE_L, type.ActivePowerDown);
+        validTransitMap.put(Command.type.PDX, type.BankActive);
     }
 
 }

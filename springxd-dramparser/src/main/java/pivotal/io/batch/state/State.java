@@ -1,5 +1,8 @@
-package pivotal.io.batch.domain;
+package pivotal.io.batch.state;
 
+
+import pivotal.io.batch.command.Command;
+import pivotal.io.batch.command.CommandUndefined;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,9 +20,9 @@ public abstract class State {
         return name;
     }
 
-    protected Map<StateCommand.type, State.type> validTransitMap = new HashMap<StateCommand.type, State.type>();
+    protected Map<Command.type, State.type> validTransitMap = new HashMap<Command.type, State.type>();
 
-    protected Set<StateCommand.type> validTransitMapKeySet;
+    protected Set<Command.type> validTransitMapKeySet;
 
     public State() {
         initValidTransitMap();
@@ -29,11 +32,11 @@ public abstract class State {
     abstract void initValidTransitMap();
 
 
-    public boolean nextState(Map<StateCommand.type, StateCommand> stateCommandFullSetMap, byte[] bytes,StateReturnHolder stateReturnHolder){
+    public boolean nextState(Map<Command.type, Command> stateCommandFullSetMap, byte[] bytes,StateReturnHolder stateReturnHolder){
         // type별 command 구현체 추출.
         // command matching확인.
-        StateCommand cmd=null;
-        for(StateCommand.type cmdType: validTransitMapKeySet){
+        Command cmd=null;
+        for(Command.type cmdType: validTransitMapKeySet){
             cmd = stateCommandFullSetMap.get(cmdType);
             if(cmd==null){
                 continue;
@@ -46,7 +49,7 @@ public abstract class State {
             }
         }
         stateReturnHolder.triedStateType =type.Undefined;
-        stateReturnHolder.triedCommand =StateCommandUndefined.getInstance();
+        stateReturnHolder.triedCommand = CommandUndefined.getInstance();
         return false;
     }
 

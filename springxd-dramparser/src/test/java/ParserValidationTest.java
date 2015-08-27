@@ -1,6 +1,6 @@
 import org.apache.hadoop.fs.Path;
-import pivotal.io.batch.StateMachine;
-import pivotal.io.batch.domain.*;
+import pivotal.io.batch.state.StateMachine;
+import pivotal.io.batch.command.Command;
 
 import java.io.*;
 import java.util.HashMap;
@@ -53,8 +53,8 @@ public class ParserValidationTest {
             String bits = "";
             String parsed = "";
             String result;
-            StateCommand command;
-            StateCommand prevCmd=null;
+            Command command;
+            Command prevCmd=null;
             byte[] buffer = new byte[4];
             byte[] bufferFinal = new byte[4];
 
@@ -76,11 +76,11 @@ public class ParserValidationTest {
             while (indata.read(buffer) >= 0) {
                 serial++;
 
-                bufferFinal = StateCommand.getBigEndian(buffer);
+                bufferFinal = Command.getBigEndian(buffer);
                 command = sm.findStateCommand(bufferFinal);
-                bits = StateCommand.byteToBits(bufferFinal);
-                bigHex = StateCommand.bytesToHex(bufferFinal);
-                parsed = StateCommand.parse(bufferFinal);
+                bits = Command.byteToBits(bufferFinal);
+                bigHex = Command.bytesToHex(bufferFinal);
+                parsed = Command.parse(bufferFinal);
 
                 if(command.equals(prevCmd)){
                     //parsed="dup-"+parsed;

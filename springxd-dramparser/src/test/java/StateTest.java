@@ -1,7 +1,8 @@
 import junit.framework.TestCase;
-import pivotal.io.batch.StateMachine;
-import pivotal.io.batch.domain.State;
-import pivotal.io.batch.domain.*;
+import pivotal.io.batch.state.StateMachine;
+import pivotal.io.batch.command.Command;
+import pivotal.io.batch.command.CommandUndefined;
+import pivotal.io.batch.state.State;
 
 public class StateTest extends TestCase{
 
@@ -17,28 +18,28 @@ public class StateTest extends TestCase{
     public void ignoretestTransit()
     {
         byte[] data = null;
-        StateCommand cmd=null;
+        Command cmd=null;
         StateMachine sm = new StateMachine();// undefined
 
 
-        StateCommand pre = new StateCommandUndefined();//PRE,PREA
+        Command pre = new CommandUndefined();//PRE,PREA
         pre.setCKE0(1);
         pre.setCS0(0);
         pre.setACTN(1);
         pre.setA16(0);
         pre.setA15(1);
         pre.setA14(0);
-        assertEquals("", StateCommand.type.PRE, sm.getStateCommandType(pre.getBytes()));
+        assertEquals("", Command.type.PRE, sm.getStateCommandType(pre.getBytes()));
 
 
-        StateCommand mrs = new StateCommandUndefined();
+        Command mrs = new CommandUndefined();
         mrs.setCKE0(1);
         mrs.setCS0(0);
         mrs.setACTN(1);
         mrs.setA16(0);
         mrs.setA15(0);
         mrs.setA14(0);
-        assertEquals("", StateCommand.type.MRS, sm.getStateCommandType(mrs.getBytes()));
+        assertEquals("", Command.type.MRS, sm.getStateCommandType(mrs.getBytes()));
 
 
         data=javax.xml.bind.DatatypeConverter.parseHexBinary("00000000"); //und
@@ -47,7 +48,7 @@ public class StateTest extends TestCase{
 
         data= javax.xml.bind.DatatypeConverter.parseHexBinary("81DD01CD"); //ACT
         cmd = sm.findStateCommand(data);
-        assertEquals("" + sm, StateCommand.type.ACT, cmd.getName());
+        assertEquals("" + sm, Command.type.ACT, cmd.getName());
         assertEquals(sm.toString(), false, sm.transit(data));
         assertEquals(sm.toString(), State.type.Undefined, sm.stateInfo.prevState.getName());
 

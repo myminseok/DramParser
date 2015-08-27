@@ -1,6 +1,7 @@
-package pivotal.io.batch;
+package pivotal.io.batch.state;
 
-import pivotal.io.batch.domain.*;
+import pivotal.io.batch.command.*;
+import pivotal.io.batch.state.*;
 
 import java.util.*;
 
@@ -9,12 +10,12 @@ import java.util.*;
  */
 public class StateMachine {
 
-    public ArrayList<StateCommand> commands = new ArrayList();
+    public ArrayList<Command> commands = new ArrayList();
 
     protected Map<State.type, State> stateObjectMap = new HashMap<State.type, State>();
-    protected Map<StateCommand.type, StateCommand> stateCommandAllMap = new HashMap<StateCommand.type, StateCommand>();
-    protected Set<StateCommand.type> stateCommandAllMapKeyset;
-    protected Set<StateCommand.type> stateCommandIgnoreMapKeyset;
+    protected Map<Command.type, Command> stateCommandAllMap = new HashMap<Command.type, Command>();
+    protected Set<Command.type> stateCommandAllMapKeyset;
+    protected Set<Command.type> stateCommandIgnoreMapKeyset;
 
 
     public StateInfo stateInfo = new StateInfo();
@@ -62,7 +63,7 @@ public class StateMachine {
         stateObjectMap.put(State.type.Reading,  StateReading.getInstance());
         stateObjectMap.put(State.type.Writing,  StateWriting.getInstance());
 
-        Set<StateCommand.type> cmdSet = stateCommandAllMap.keySet();
+        Set<Command.type> cmdSet = stateCommandAllMap.keySet();
 
 
     }
@@ -71,35 +72,35 @@ public class StateMachine {
     private void initCommand(){
 
 
-        stateCommandAllMap.put(StateCommand.type.UND, StateCommandUndefined.getInstance());
-        stateCommandAllMap.put(StateCommand.type.NOP, StateCommandNOP.getInstance());
-        stateCommandAllMap.put(StateCommand.type.DES, StateCommandDES.getInstance());
-        stateCommandAllMap.put(StateCommand.type.ACT, StateCommandACT.getInstance());
-        stateCommandAllMap.put(StateCommand.type.CKE_L, StateCommandCLEL.getInstance());
-        stateCommandAllMap.put(StateCommand.type.PDE, StateCommandPDE.getInstance());
-        stateCommandAllMap.put(StateCommand.type.PDX, StateCommandPDX.getInstance());
-        stateCommandAllMap.put(StateCommand.type.PRE, StateCommandPRE.getInstance());
-        stateCommandAllMap.put(StateCommand.type.RD, StateCommandRD.getInstance());
-        stateCommandAllMap.put(StateCommand.type.REF, StateCommandREF.getInstance());
-        stateCommandAllMap.put(StateCommand.type.WR, StateCommandWR.getInstance());
-        stateCommandAllMap.put(StateCommand.type.ZQC, StateCommandZQC.getInstance());
-        stateCommandAllMap.put(StateCommand.type.SRE, StateCommandZQC.getInstance());
-        stateCommandAllMap.put(StateCommand.type.MRS, StateCommandMRS.getInstance());
+        stateCommandAllMap.put(Command.type.UND, CommandUndefined.getInstance());
+        stateCommandAllMap.put(Command.type.NOP, CommandNOP.getInstance());
+        stateCommandAllMap.put(Command.type.DES, CommandDES.getInstance());
+        stateCommandAllMap.put(Command.type.ACT, CommandACT.getInstance());
+        stateCommandAllMap.put(Command.type.CKE_L, CommandCLEL.getInstance());
+        stateCommandAllMap.put(Command.type.PDE, CommandPDE.getInstance());
+        stateCommandAllMap.put(Command.type.PDX, CommandPDX.getInstance());
+        stateCommandAllMap.put(Command.type.PRE, CommandPRE.getInstance());
+        stateCommandAllMap.put(Command.type.RD, CommandRD.getInstance());
+        stateCommandAllMap.put(Command.type.REF, CommandREF.getInstance());
+        stateCommandAllMap.put(Command.type.WR, CommandWR.getInstance());
+        stateCommandAllMap.put(Command.type.ZQC, CommandZQC.getInstance());
+        stateCommandAllMap.put(Command.type.SRE, CommandZQC.getInstance());
+        stateCommandAllMap.put(Command.type.MRS, CommandMRS.getInstance());
 
         stateCommandAllMapKeyset = stateCommandAllMap.keySet();
-        stateCommandAllMapKeyset.remove(StateCommand.type.CKE_L);
-        stateCommandAllMapKeyset.remove(StateCommand.type.UND);
-        stateCommandAllMapKeyset.remove(StateCommand.type.PDX);
+        stateCommandAllMapKeyset.remove(Command.type.CKE_L);
+        stateCommandAllMapKeyset.remove(Command.type.UND);
+        stateCommandAllMapKeyset.remove(Command.type.PDX);
 
         stateCommandIgnoreMapKeyset = new HashSet();
-        stateCommandIgnoreMapKeyset.add(StateCommand.type.NOP);
-        stateCommandIgnoreMapKeyset.add(StateCommand.type.DES);
+        stateCommandIgnoreMapKeyset.add(Command.type.NOP);
+        stateCommandIgnoreMapKeyset.add(Command.type.DES);
     }
 
     public boolean isIgnoreCommand(byte[] bytes){
 
-        StateCommand cmd=null;
-        for(StateCommand.type cmdType: stateCommandIgnoreMapKeyset){
+        Command cmd=null;
+        for(Command.type cmdType: stateCommandIgnoreMapKeyset){
             cmd = stateCommandAllMap.get(cmdType);
             if(cmd==null){
                 continue;
@@ -112,10 +113,10 @@ public class StateMachine {
     }
 
 
-    public StateCommand findStateCommand(byte[] bytes){
+    public Command findStateCommand(byte[] bytes){
 
-        StateCommand cmd=null;
-        for(StateCommand.type cmdType: stateCommandAllMapKeyset){
+        Command cmd=null;
+        for(Command.type cmdType: stateCommandAllMapKeyset){
             cmd = stateCommandAllMap.get(cmdType);
             if(cmd==null){
                 continue;
@@ -124,10 +125,10 @@ public class StateMachine {
                 return cmd;
             }
         }
-        return StateCommandUndefined.getInstance();
+        return CommandUndefined.getInstance();
     }
 
-    public StateCommand.type getStateCommandType(byte[] bytes){
+    public Command.type getStateCommandType(byte[] bytes){
         return findStateCommand(bytes).getName();
     }
 

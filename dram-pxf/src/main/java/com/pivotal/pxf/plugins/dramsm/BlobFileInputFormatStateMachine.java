@@ -12,9 +12,9 @@ import org.apache.hadoop.mapred.InputSplit;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.RecordReader;
 import org.apache.hadoop.mapred.Reporter;
-import pivotal.io.batch.StateMachine;
-import pivotal.io.batch.domain.StateCommand;
-import pivotal.io.batch.domain.StateCommandUndefined;
+import pivotal.io.batch.state.StateMachine;
+import pivotal.io.batch.command.Command;
+import pivotal.io.batch.command.CommandUndefined;
 
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -74,8 +74,8 @@ public class BlobFileInputFormatStateMachine extends FileInputFormat<Text, Bytes
 		private String parsed="";
 		private long serial=0;
 
-		StateCommand command;
-		StateCommand undefinedCmd= StateCommandUndefined.getInstance();
+		Command command;
+		Command undefinedCmd= CommandUndefined.getInstance();
 		boolean isTransit=false;
 
 		@Override
@@ -101,9 +101,9 @@ public class BlobFileInputFormatStateMachine extends FileInputFormat<Text, Bytes
 						continue;
 					}
 					isTransit = sm.transit(bufferFinal);
-					bits = StateCommand.byteToBits(bufferFinal);
-					bigHex = StateCommand.bytesToHex(bufferFinal);
-					parsed = StateCommand.parse(bufferFinal);
+					bits = Command.byteToBits(bufferFinal);
+					bigHex = Command.bytesToHex(bufferFinal);
+					parsed = Command.parse(bufferFinal);
 					command= sm.getTrialValueHolder().triedCommand;
 
 					if(undefinedCmd.equals(command)){

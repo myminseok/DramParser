@@ -1,28 +1,28 @@
-package pivotal.io.batch.domain;
+package pivotal.io.batch.command;
 
 /**
 
  */
-public class StateCommandREF extends StateCommand{
+public class CommandSRE extends Command {
 
-    public static StateCommand instance=null;
+    public static Command instance=null;
 
-    public static StateCommand getInstance(){
+    public static Command getInstance(){
         if(instance==null){
-            instance= new StateCommandREF();
+            instance= new CommandSRE();
         }
         return instance;
     }
 
-    public StateCommandREF(){
-        this.name= type.REF;
+    public CommandSRE(){
+        this.name= type.SRE;
 
     }
 
 
     public boolean isMatching(byte[] v){
 
-        return   this.getBit(v, INDEX.CKE0.getBinaryIndex())==1 &&
+        return   this.getBit(v, INDEX.CKE0.getBinaryIndex())==0 &&
                 this.getBit(v, INDEX.CS0.getBinaryIndex())==0 &&
                 this.getBit(v, INDEX.ACTN.getBinaryIndex())==1 &&
                 this.getBit(v, INDEX.A16.getBinaryIndex())==0 &&

@@ -1,5 +1,7 @@
-package pivotal.io.batch.domain;
+package pivotal.io.batch.state;
 
+
+import pivotal.io.batch.command.Command;
 
 public class StateReading extends State{
 
@@ -20,10 +22,10 @@ public class StateReading extends State{
 
 
     void initValidTransitMap(){
-        validTransitMap.put(StateCommand.type.WR,  type.Writing);
-        validTransitMap.put(StateCommand.type.RD,  type.Reading);
-        validTransitMap.put(StateCommand.type.PRE,  type.IDLE);
-        validTransitMap.put(StateCommand.type.ACT,  type.BankActive); // TODO ??
+        validTransitMap.put(Command.type.WR,  type.Writing);
+        validTransitMap.put(Command.type.RD,  type.Reading);
+        validTransitMap.put(Command.type.PRE,  type.IDLE);
+        validTransitMap.put(Command.type.ACT,  type.BankActive); // TODO ??
     }
 
 

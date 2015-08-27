@@ -1,4 +1,6 @@
-package pivotal.io.batch.domain;
+package pivotal.io.batch.state;
+
+import pivotal.io.batch.command.Command;
 
 /**
  * Created by kimm5 on 8/10/15.
@@ -6,7 +8,7 @@ package pivotal.io.batch.domain;
 public class StateReturnHolder {
 
     public State.type triedStateType =null;
-    public StateCommand triedCommand =null;
+    public Command triedCommand =null;
 
     public void clear(){
         this.triedStateType =null;

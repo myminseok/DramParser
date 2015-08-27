@@ -1,20 +1,20 @@
-package pivotal.io.batch.domain;
+package pivotal.io.batch.command;
 
 /**
 
  */
-public class StateCommandPDX extends StateCommand{
+public class CommandPDX extends Command {
 
-    public static StateCommand instance=null;
+    public static Command instance=null;
 
-    public static StateCommand getInstance(){
+    public static Command getInstance(){
         if(instance==null){
-            instance= new StateCommandPDX();
+            instance= new CommandPDX();
         }
         return instance;
     }
 
-    public StateCommandPDX(){
+    public CommandPDX(){
         this.name= type.PDX;
 
     }

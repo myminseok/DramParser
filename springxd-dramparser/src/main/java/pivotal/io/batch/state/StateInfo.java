@@ -1,4 +1,6 @@
-package pivotal.io.batch.domain;
+package pivotal.io.batch.state;
+
+import pivotal.io.batch.command.Command;
 
 /**
  * Created by kimm5 on 8/10/15.
@@ -9,7 +11,7 @@ public class StateInfo {
     public State currentState = StateUndefined.getInstance();
     public boolean isTransit=false;
 
-    public StateCommand newCommand =null;
+    public Command newCommand =null;
     public byte[] newData= null;
 
 

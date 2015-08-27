@@ -1,5 +1,4 @@
 import org.apache.hadoop.fs.Path;
-import pivotal.io.batch.domain.StateCommand;
 
 import java.io.*;
 
@@ -36,7 +35,7 @@ public class DataFileSpliter {
             byte[] bufferFinal;
 
             int fileunit = 1000000;
-            while (is.read(buffer) >= 0 && serial < fileunit * 1) {
+            while (is.read(buffer) >= 0 && serial < fileunit * 2) {
                 if (serial % fileunit == 0) {
                     if (oFile != null) oFile.close();
                     File outfile = new File(outdirpath + File.separator + infile.getName() + ".sample." + (serial / fileunit));

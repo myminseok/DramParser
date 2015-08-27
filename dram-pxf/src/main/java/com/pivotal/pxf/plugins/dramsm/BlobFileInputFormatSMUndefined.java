@@ -7,9 +7,9 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
-import pivotal.io.batch.StateMachine;
-import pivotal.io.batch.domain.StateCommand;
-import pivotal.io.batch.domain.StateCommandUndefined;
+import pivotal.io.batch.state.StateMachine;
+import pivotal.io.batch.command.Command;
+import pivotal.io.batch.command.CommandUndefined;
 
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -69,8 +69,8 @@ public class BlobFileInputFormatSMUndefined extends FileInputFormat<Text, BytesW
 		private String parsed="";
 		private long serial=0;
 
-		StateCommand command;
-		StateCommand undefinedCmd= StateCommandUndefined.getInstance();
+		Command command;
+		Command undefinedCmd= CommandUndefined.getInstance();
 		boolean isTransit=false;
 
 		@Override
@@ -96,9 +96,9 @@ public class BlobFileInputFormatSMUndefined extends FileInputFormat<Text, BytesW
 						continue;
 					}
 					isTransit = sm.transit(bufferFinal);
-					bits = StateCommand.byteToBits(bufferFinal);
-					bigHex = StateCommand.bytesToHex(bufferFinal);
-					parsed = StateCommand.parse(bufferFinal);
+					bits = Command.byteToBits(bufferFinal);
+					bigHex = Command.bytesToHex(bufferFinal);
+					parsed = Command.parse(bufferFinal);
 					command= sm.getTrialValueHolder().triedCommand;
 
 					if(!undefinedCmd.equals(command)){

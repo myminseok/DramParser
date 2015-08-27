@@ -1,6 +1,6 @@
-package pivotal.io.batch.domain;
+package pivotal.io.batch.command;
 
-public abstract class StateCommand {
+public abstract class Command {
 
     type name;
     byte bytes[] = new byte[]{0,0,0,0};
@@ -54,11 +54,11 @@ public abstract class StateCommand {
     public abstract boolean isMatching(byte[] bytes);
 
 
-    public StateCommand(){
+    public Command(){
 //        initStateTransitonMap();
     }
 
-    public StateCommand(type name){
+    public Command(type name){
         this.name=name;
 //        initStateTransitonMap();
     }
@@ -180,7 +180,7 @@ public abstract class StateCommand {
 
     
     public int getBit(int pos){
-        return StateCommand.getBit(this.bytes, pos);
+        return Command.getBit(this.bytes, pos);
     }
 
     public String byteToHexs(){
@@ -288,12 +288,12 @@ public abstract class StateCommand {
 
     public static String parse(byte[] v){
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("%s(%s):%s, ", INDEX.CKE0.name(), INDEX.CKE0.getHumanIndex(), StateCommand.getBit(v, INDEX.CKE0.getBinaryIndex())));
-        sb.append(String.format("%s(%s):%s, ", INDEX.CS0.name(), INDEX.CS0.getHumanIndex(), StateCommand.getBit(v, INDEX.CS0.getBinaryIndex())));
-        sb.append(String.format("%s(%s):%s, ", INDEX.ACTN.name(), INDEX.ACTN.getHumanIndex(),  StateCommand.getBit(v, INDEX.ACTN.getBinaryIndex())));
-        sb.append(String.format("%s(%s):%s, ", INDEX.A16.name(), INDEX.A16.getHumanIndex(), StateCommand.getBit(v, INDEX.A16.getBinaryIndex())));
-        sb.append(String.format("%s(%s):%s, ", INDEX.A15.name(), INDEX.A15.getHumanIndex(), StateCommand.getBit(v, INDEX.A15.getBinaryIndex())));
-        sb.append(String.format("%s(%s):%s", INDEX.A14.name(), INDEX.A14.getHumanIndex(), StateCommand.getBit(v, INDEX.A14.getBinaryIndex())));
+        sb.append(String.format("%s(%s):%s, ", INDEX.CKE0.name(), INDEX.CKE0.getHumanIndex(), Command.getBit(v, INDEX.CKE0.getBinaryIndex())));
+        sb.append(String.format("%s(%s):%s, ", INDEX.CS0.name(), INDEX.CS0.getHumanIndex(), Command.getBit(v, INDEX.CS0.getBinaryIndex())));
+        sb.append(String.format("%s(%s):%s, ", INDEX.ACTN.name(), INDEX.ACTN.getHumanIndex(),  Command.getBit(v, INDEX.ACTN.getBinaryIndex())));
+        sb.append(String.format("%s(%s):%s, ", INDEX.A16.name(), INDEX.A16.getHumanIndex(), Command.getBit(v, INDEX.A16.getBinaryIndex())));
+        sb.append(String.format("%s(%s):%s, ", INDEX.A15.name(), INDEX.A15.getHumanIndex(), Command.getBit(v, INDEX.A15.getBinaryIndex())));
+        sb.append(String.format("%s(%s):%s", INDEX.A14.name(), INDEX.A14.getHumanIndex(), Command.getBit(v, INDEX.A14.getBinaryIndex())));
         return sb.toString();
 
     }

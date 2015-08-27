@@ -1,20 +1,20 @@
-package pivotal.io.batch.domain;
+package pivotal.io.batch.command;
 
 /**
 
  */
-public class StateCommandDES extends StateCommand{
+public class CommandDES extends Command {
 
-    public static StateCommand instance=null;
+    public static Command instance=null;
 
-    public static StateCommand getInstance(){
+    public static Command getInstance(){
         if(instance==null){
-            instance= new StateCommandDES();
+            instance= new CommandDES();
         }
         return instance;
     }
 
-    public StateCommandDES(){
+    public CommandDES(){
         this.name= type.DES;
 
     }
