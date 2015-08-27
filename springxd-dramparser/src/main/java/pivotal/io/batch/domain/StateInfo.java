@@ -5,10 +5,8 @@ package pivotal.io.batch.domain;
  */
 public class StateInfo {
 
-    public static State stateUndefined= new StateUndefined();
-
-    public State prevState = stateUndefined;
-    public State currentState = stateUndefined;
+    public State prevState = StateUndefined.getInstance();
+    public State currentState = StateUndefined.getInstance();
     public boolean isTransit=false;
 
     public StateCommand newCommand =null;
@@ -39,7 +37,6 @@ public class StateInfo {
         if(isTransit) {
             sb.append(prevState == null ? "" : prevState.getName()).append(", ");
             sb.append((newCommand == null ? "" : newCommand.getName())).append(", ");
-//            sb.append(newData == null ? "" : StateCommand.byteToBits(newData)).append(",\t");
             sb.append(currentState == null ? "" : currentState.getName());
             return sb.toString();
         } else {

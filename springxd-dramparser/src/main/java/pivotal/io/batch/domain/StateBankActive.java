@@ -21,6 +21,7 @@ public class StateBankActive extends State{
         validTransitMap.put(StateCommand.type.RD,  type.Reading);
         validTransitMap.put(StateCommand.type.WR,  type.Writing);
         validTransitMap.put(StateCommand.type.PRE,  type.IDLE);
+        validTransitMap.put(StateCommand.type.ACT,  type.BankActive); // TODO ???
 
 
     }

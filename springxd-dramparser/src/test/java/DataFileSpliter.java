@@ -9,38 +9,21 @@ import java.io.*;
 public class DataFileSpliter {
 
     public static void main(String[] args) throws Exception {
-        String infilepath=new Path(System.getProperty("user.dir")+ File.separator +"src/test/data/sampledata/rawdata.txt.sample.0").toString();
-        String outdirpath=new Path(System.getProperty("user.dir")+ File.separator +"src/test/data/out").toString();
-        Parser parser = new Parser(infilepath, outdirpath, "csv");
-        parser.execute();
+        String infilepath = new Path(System.getProperty("user.dir") + File.separator + "src/test/data/rawdata/rawdata.txt").toString();
+        String outdirpath = new Path(System.getProperty("user.dir") + File.separator + "src/test/data/sampledata").toString();
+        DataFileSpliter parser = new DataFileSpliter();
+        parser.execute(infilepath, outdirpath);
     }
 
-}
 
-class Parser {
 
-    private String infilepath = null;
-    private String outdirpath = null;
-
-    public Parser(String infilepath, String outdirpath, String outfileextension) {
-        this.infilepath = infilepath;
-        this.outdirpath = outdirpath;
-        System.out.println("infilepath:" + infilepath);
-        System.out.println("outdirpath:" + outdirpath);
-    }
-
-    public void execute() throws Exception {
+    public void execute(String indatapath, String outdirpath) throws Exception {
 
         long lStartTime = System.currentTimeMillis();
-
-        File infile = new File(infilepath);
-
-
-
-
+        File infile = new File(indatapath);
         if (!infile.exists()) {
-            System.out.println("file not found:" + infilepath);
-            throw new FileNotFoundException(infilepath);
+            System.out.println("file not found:" + indatapath);
+            throw new FileNotFoundException(indatapath);
         }
 
         InputStream is = null;
@@ -52,16 +35,15 @@ class Parser {
             byte[] buffer = new byte[4];
             byte[] bufferFinal;
 
-            int fileunit=1000000;
-            while (is.read(buffer) >= 0 && serial < fileunit*3) {
-                if(serial % fileunit == 0){
+            int fileunit = 1000000;
+            while (is.read(buffer) >= 0 && serial < fileunit * 1) {
+                if (serial % fileunit == 0) {
                     if (oFile != null) oFile.close();
-                    File outfile = new File(outdirpath + File.separator + infile.getName() + ".sample."+ (serial / fileunit));
+                    File outfile = new File(outdirpath + File.separator + infile.getName() + ".sample." + (serial / fileunit));
                     oFile = new FileOutputStream(outfile);
                 }
                 serial++;
-                bufferFinal = StateCommand.getBigEndian(buffer);
-                oFile.write(bufferFinal);
+                oFile.write(buffer);
             }
 
         } finally {

@@ -8,6 +8,7 @@
 .DS_Store
 **/*.class
 **/src/test/data/**
+dram-pxf/src/test/resources/dramdata/
 **/*.tar.gz
 .idea/*
 *.iml

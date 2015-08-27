@@ -1,7 +1,6 @@
 package com.pivotal.pxf.plugins.dramsm;
 
 import com.gopivotal.mapred.input.CombineWholeFileInputFormat;
-import com.pivotal.pxf.plugins.Utils;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -15,6 +14,7 @@ import org.apache.hadoop.mapred.RecordReader;
 import org.apache.hadoop.mapred.Reporter;
 import pivotal.io.batch.StateMachine;
 import pivotal.io.batch.domain.StateCommand;
+import pivotal.io.batch.domain.StateCommandUndefined;
 
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -25,9 +25,9 @@ import java.util.logging.Logger;
  * the {@link CombineWholeFileInputFormat} could be used to batch them together
  * into a configurable number of map tasks.
  */
-public class BlobFileInputFormatWithStateMachine extends FileInputFormat<Text, BytesWritable> {
+public class BlobFileInputFormatStateMachine extends FileInputFormat<Text, BytesWritable> {
 
-	private static final Logger LOG = Logger.getLogger(BlobFileInputFormatWithStateMachine.class.getName());
+	private static final Logger LOG = Logger.getLogger(BlobFileInputFormatStateMachine.class.getName());
 
 	@Override
 	protected boolean isSplitable(FileSystem fs, Path filename) {
@@ -72,33 +72,46 @@ public class BlobFileInputFormatWithStateMachine extends FileInputFormat<Text, B
 		private String bigHex="";
 		private String bits="";
 		private String parsed="";
-		private long itemSerial=0;
+		private long serial=0;
+
+		StateCommand command;
+		StateCommand undefinedCmd= StateCommandUndefined.getInstance();
+		boolean isTransit=false;
 
 		@Override
 		public boolean next(Text key, BytesWritable value) throws IOException {
 
 			if (readComplete) {
-				LOG.info("BlobFileInputFormatWithStateMachine finish! ");
+				LOG.info("BlobFileInputFormatStateMachine finish! ");
 				return false;
 			}
 			key.set(filename);
 			try {
 
-				byte[] buffer = new byte[4];
+				byte[] bufferFinal = new byte[4];
+				String result=null;
+				while (inStream.read(bufferFinal) >= 0) {
+					serial++;
 
-				while (inStream.read(buffer) >= 0) {
-					itemSerial++;
-
-					if (itemSerial % 100000==0) {
-						LOG.info(String.format("%s, %s", filename, itemSerial));
+					if (serial % 1000000==0) {
+						LOG.info(String.format("%s, %s", filename, serial));
 					}
 
-					String result = process(buffer);
-					if (result == null) {
+					if(sm.isIgnoreCommand(bufferFinal)){
 						continue;
 					}
+					isTransit = sm.transit(bufferFinal);
+					bits = StateCommand.byteToBits(bufferFinal);
+					bigHex = StateCommand.bytesToHex(bufferFinal);
+					parsed = StateCommand.parse(bufferFinal);
+					command= sm.getTrialValueHolder().triedCommand;
+
+					if(undefinedCmd.equals(command)){
+						result = String.format("%10s, %s, %s, %s, %s\n", serial, sm, sm.findStateCommand(bufferFinal).getName(), bits, parsed);
+					}else {
+						result = String.format("%10s, %s, %s, %s, %s\n", serial, sm, isTransit, bits, parsed );
+					}
 					value.set(result.getBytes(), 0, result.getBytes().length);
-//					LOG.info("format: "+new String(value.getBytes()));
 					return true;
 				}
 				readComplete = true;
@@ -108,21 +121,6 @@ public class BlobFileInputFormatWithStateMachine extends FileInputFormat<Text, B
 				throw new RuntimeException(e);
 			}
 
-		}
-		private String process(byte[] buf){
-
-			byte[] buffer = Utils.getBigEndian(buf);
-			bigHex = StateCommand.bytesToHex(buffer);
-			bits = StateCommand.byteToBits(buffer);
-			parsed = StateCommand.parse(buffer);
-
-			if(prevHex.equals(bigHex)){ // prevent dup
-				return null;
-			}
-			prevHex=bigHex;
-			boolean isTransit = sm.transit(buffer);
-
-			return String.format("%s, %s, %s, %s, %s", sm, isTransit, itemSerial, bits, parsed);
 		}
 
 		@Override

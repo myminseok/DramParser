@@ -1,8 +1,6 @@
 package pivotal.io.batch.domain;
 
 
-import pivotal.io.batch.StateMachine;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -42,12 +40,13 @@ public abstract class State {
             }
 
             if(cmd.isMatching(bytes)){
-                stateReturnHolder.nextCommand=cmd;
-                stateReturnHolder.nextStateType=validTransitMap.get(cmdType);
+                stateReturnHolder.triedCommand =cmd;
+                stateReturnHolder.triedStateType =validTransitMap.get(cmdType);
                 return true;
             }
         }
-        stateReturnHolder.nextStateType=type.Undefined;
+        stateReturnHolder.triedStateType =type.Undefined;
+        stateReturnHolder.triedCommand =StateCommandUndefined.getInstance();
         return false;
     }
 

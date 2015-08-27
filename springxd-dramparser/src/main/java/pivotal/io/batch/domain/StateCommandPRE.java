@@ -21,8 +21,8 @@ public class StateCommandPRE extends StateCommand{
 
 
     public boolean isMatching(byte[] v){
-
-        return       this.getBit(v, INDEX.CS0.getBinaryIndex())==0 &&
+        return this.getBit(v, INDEX.CKE0.getBinaryIndex())==1 &&
+               this.getBit(v, INDEX.CS0.getBinaryIndex())==0 &&
                 this.getBit(v, INDEX.ACTN.getBinaryIndex())==1 &&
                 this.getBit(v, INDEX.A16.getBinaryIndex())==0 &&
                 this.getBit(v, INDEX.A15.getBinaryIndex())==1 &&

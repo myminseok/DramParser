@@ -5,11 +5,11 @@ package pivotal.io.batch.domain;
  */
 public class StateReturnHolder {
 
-    public State.type nextStateType=null;
-    public StateCommand nextCommand=null;
+    public State.type triedStateType =null;
+    public StateCommand triedCommand =null;
 
     public void clear(){
-        this.nextStateType=null;
-        this.nextCommand=null;
+        this.triedStateType =null;
+        this.triedCommand =null;
     }
 }

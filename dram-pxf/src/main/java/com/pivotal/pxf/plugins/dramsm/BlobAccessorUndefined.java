@@ -44,13 +44,13 @@ import java.util.logging.Logger;
  * sys.exit(0)
  * </pre>
  */
-public class BlobAccessor extends HdfsSplittableDataAccessor {
-	private static final Logger LOG = Logger.getLogger(BlobAccessor.class.getName());
+public class BlobAccessorUndefined extends HdfsSplittableDataAccessor {
+	private static final Logger LOG = Logger.getLogger(BlobAccessorUndefined.class.getName());
 
 	private long serial=0;
 
-	public BlobAccessor(InputData input) throws Exception {
-		super(input, new BlobFileInputFormatStateMachine());
+	public BlobAccessorUndefined(InputData input) throws Exception {
+		super(input, new BlobFileInputFormatSMUndefined());
 
 	}
 
@@ -58,8 +58,8 @@ public class BlobAccessor extends HdfsSplittableDataAccessor {
 	protected Object getReader(JobConf conf, InputSplit split)
 			throws IOException {
 		try {
-			LOG.info("creating BlobFileInputFormatStateMachine.WholeFileRecordReader()");
-			return new BlobFileInputFormatStateMachine.WholeFileRecordReader(split, conf);
+			LOG.info("creating BlobFileInputFormatSMUndefined.WholeFileRecordReader()");
+			return new BlobFileInputFormatSMUndefined.WholeFileRecordReader(split, conf);
 		} catch (Exception e) {
 			throw new IOException(e);
 		}

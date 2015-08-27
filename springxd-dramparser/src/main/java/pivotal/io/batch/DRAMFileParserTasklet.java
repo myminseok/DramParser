@@ -127,7 +127,7 @@ public class DRAMFileParserTasklet implements Tasklet, StepExecutionListener {
 
 	private void run(String infilepath, String outdirpath, String outfileextension) throws Exception{
 
-		(new Parser(infilepath, outdirpath,outfileextension)).execute();
+		(new Parser(infilepath, outdirpath)).execute();
 
 	}
 

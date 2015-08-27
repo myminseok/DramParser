@@ -1,4 +1,3 @@
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import junit.framework.TestCase;
 import pivotal.io.batch.StateMachine;
 import pivotal.io.batch.domain.State;
@@ -47,7 +46,7 @@ public class StateTest extends TestCase{
         assertEquals(sm.toString(), State.type.Undefined, sm.stateInfo.prevState.getName());
 
         data= javax.xml.bind.DatatypeConverter.parseHexBinary("81DD01CD"); //ACT
-        cmd = sm.getStateCommand(data);
+        cmd = sm.findStateCommand(data);
         assertEquals("" + sm, StateCommand.type.ACT, cmd.getName());
         assertEquals(sm.toString(), false, sm.transit(data));
         assertEquals(sm.toString(), State.type.Undefined, sm.stateInfo.prevState.getName());
@@ -101,7 +100,7 @@ public class StateTest extends TestCase{
 
 
         data=javax.xml.bind.DatatypeConverter.parseHexBinary("00000000"); //und
-        cmd = sm.getStateCommand(data);
+        cmd = sm.findStateCommand(data);
         assertEquals("" + sm, false, sm.transit(data));
         assertEquals("transit test: ", State.type.Reading, sm.stateInfo.prevState.getName());
 

@@ -1,7 +1,7 @@
 package pivotal.io.batch;
 
-import pivotal.io.batch.domain.State;
 import pivotal.io.batch.domain.StateCommand;
+import pivotal.io.batch.domain.StateCommandUndefined;
 
 import java.io.*;
 import java.util.HashMap;
@@ -11,37 +11,35 @@ public class Parser {
 
     private String infilepath=null;
     private String outdirpath=null;
-    private String outfileextension=null;
 
 
-    public Parser(String infilepath, String outdirpath, String outfileextension){
+    public Parser(String infilepath, String outdirpath){
         this.infilepath=infilepath;
         this.outdirpath=outdirpath;
-        this.outfileextension=outfileextension;
         System.out.println("infilepath:"+infilepath);
         System.out.println("outdirpath:"+outdirpath);
-//        System.out.println("outfileextension:"+outfileextension);
     }
 
 
-    private void printHeaderTransit(StateMachine sm ,FileWriter oTransit)  throws Exception{
+    private void printHeaderTransit(StateMachine sm ,BufferedWriter out)  throws Exception{
         StringBuilder sboTransit = new StringBuilder();
-        sboTransit.append("serial,\t");
-        sboTransit.append(sm.stateInfo.toStringHeader(true)).append(",\t");
-        sboTransit.append("bits,\t");
-        sboTransit.append(StateCommand.parseHeader());
+        sboTransit.append("serial,");
+        sboTransit.append(sm.stateInfo.toStringHeader(true)).append(",");
+        sboTransit.append("bits,");
+        sboTransit.append(StateCommand.parseHeader()+",");
+        sboTransit.append("isTransit");
         sboTransit.append("\n");
-        oTransit.write(sboTransit.toString());
+        out.write(sboTransit.toString());
     }
-    private void printHeaderInvalid(StateMachine sm ,FileWriter oInvalid)  throws Exception{
-        StringBuilder sboInvalid = new StringBuilder();
-        sboInvalid.append("serial,\t");
-        sboInvalid.append(sm.stateInfo.toStringHeader(false)).append(",\t");
-        sboInvalid.append("cmd,\t");
-        sboInvalid.append("bits,\t");
-        sboInvalid.append(StateCommand.parseHeader());
-        sboInvalid.append("\n");
-        oInvalid.write(sboInvalid.toString());
+    private void printHeaderInvalid(StateMachine sm ,BufferedWriter out)  throws Exception{
+        StringBuilder sb = new StringBuilder();
+        sb.append("serial,");
+        sb.append(sm.stateInfo.toStringHeader(false)).append(",");
+        sb.append("cmd,");
+        sb.append("bits,");
+        sb.append(StateCommand.parseHeader());
+        sb.append("\n");
+        out.write(sb.toString());
     }
 
     public void execute() throws Exception{
@@ -52,7 +50,7 @@ public class Parser {
 
         File outfileUnique = new File(outdirpath+File.separator+infile.getName()+".unique.csv");
         File outfiletransit = new File(outdirpath+File.separator+infile.getName()+".transit.csv");
-        File outfileinvalid = new File(outdirpath+File.separator+infile.getName()+".invalid.csv");
+        File outfileinvalid = new File(outdirpath+File.separator+infile.getName()+".undefined.csv");
 
         if(!infile.exists()){
             System.out.println("file not found:"+infilepath);
@@ -60,10 +58,9 @@ public class Parser {
         }
 
         InputStream is=null;
-        FileWriter oUnique=null;
-        FileWriter oTransit=null;
-        FileWriter oInvalid=null;
-
+        BufferedWriter oUnique=null;
+        BufferedWriter oTransit=null;
+        BufferedWriter oinvalid=null;
 
         StateMachine sm = new StateMachine();
 
@@ -71,50 +68,50 @@ public class Parser {
         try {
 
             is = new FileInputStream(infile);
-            oUnique = new FileWriter(outfileUnique);
-            oTransit = new FileWriter(outfiletransit);
-            oInvalid = new FileWriter(outfileinvalid);
+            oUnique = new BufferedWriter(new FileWriter(outfileUnique));
+            oTransit = new BufferedWriter(new FileWriter(outfiletransit));
+            oinvalid = new BufferedWriter(new FileWriter(outfileinvalid));
             int serial=0;
             String bigHex="";
             String bits="";
             String parsed="";
-            byte[] buffer = new byte[4];
             byte[] bufferFinal = new byte[4];
 
             boolean isTransit=false;
 
-
             printHeaderTransit(sm,oTransit );
-            printHeaderInvalid(sm, oInvalid);
+            printHeaderInvalid(sm,oinvalid);
 
-
-            String prevTransit="";
-            String prevNoTransit="";
-
-            while (is.read(buffer) >= 0 && serial < 1000000) {
+            StateCommand command;
+            StateCommand prevCmd=null;
+            StateCommand undefinedCmd=StateCommandUndefined.getInstance();
+//            while (is.read(bufferFinal) >= 0 && serial < 1000000) {
+            while (is.read(bufferFinal) >= 0 ) {
                 serial++;
-                bufferFinal = StateCommand.getBigEndian(buffer);
+                if(serial % 100000==0) {
+                    System.out.println("serial: "+serial);
+                }
+//                bufferFinal = StateCommand.getBigEndian(buffer);
+                if(sm.isIgnoreCommand(bufferFinal)){
+                    continue;
+                }
                 isTransit = sm.transit(bufferFinal);
                 bits = StateCommand.byteToBits(bufferFinal);
                 bigHex = StateCommand.bytesToHex(bufferFinal);
                 parsed = StateCommand.parse(bufferFinal);
-
+                command= sm.getTrialValueHolder().triedCommand;
+                if(undefinedCmd.equals(command)){
+                    oinvalid.write(String.format("%10s, %s, %s,  %s, %s\n", serial, sm, sm.findStateCommand(bufferFinal).getName(), bits, parsed));
+                    continue;
+                }
+                if(command.equals(prevCmd)){ // prevent dup
+                    continue;
+                }
+                prevCmd=command;
                 if(isTransit){
-
-                    if(prevTransit.equals(bigHex)){ // prevent dup
-                        continue;
-                    }
-                    oTransit.write(String.format("%10s, %30s, %s, %s\n", serial, sm, bits, parsed));
-                    prevTransit=bigHex;
-
+                    oTransit.write(String.format("%10s, %30s, %s, %s, %s\n", serial, sm, bits, parsed, isTransit));
                 }else{
-
-                    if(prevNoTransit.equals(bigHex)){// prevent dup
-                        continue;
-                    }
-                    oInvalid.write(String.format("%10s, %15s, %15s, %s, %s\n", serial, sm, sm.getStateCommandType(bufferFinal), bits, parsed));
-//                    oInvalid.write(String.format("%10s, %15s, %s, %s\n", serial, sm,  bits, parsed));
-                    prevNoTransit=bigHex;
+                    oTransit.write(String.format("%10s, %30s, %s, %s, %s\n", serial, sm, bits, parsed, isTransit));
                 }
 
                 if(!commandMap.containsKey(bits)){
@@ -128,7 +125,7 @@ public class Parser {
         }finally{
             if(is!=null) is.close();
             if(oTransit!=null) oTransit.close();
-            if(oInvalid!=null) oInvalid.close();
+            if(oinvalid!=null) oinvalid.close();
             if(oUnique!=null) oUnique.close();
         }
 

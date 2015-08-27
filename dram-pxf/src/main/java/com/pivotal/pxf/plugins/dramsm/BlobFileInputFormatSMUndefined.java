@@ -1,21 +1,18 @@
-package com.pivotal.pxf.plugins.dram;
-
-import java.io.IOException;
-import java.util.logging.Logger;
+package com.pivotal.pxf.plugins.dramsm;
 
 import com.gopivotal.mapred.input.CombineWholeFileInputFormat;
-import com.pivotal.pxf.plugins.Utils;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.FileSplit;
-import org.apache.hadoop.mapred.InputSplit;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.RecordReader;
-import org.apache.hadoop.mapred.Reporter;
+import org.apache.hadoop.mapred.*;
+import pivotal.io.batch.StateMachine;
+import pivotal.io.batch.domain.StateCommand;
+import pivotal.io.batch.domain.StateCommandUndefined;
+
+import java.io.IOException;
+import java.util.logging.Logger;
 
 /**
  * A {@link FileInputFormat} implementation that passes the file name as the key
@@ -23,9 +20,9 @@ import org.apache.hadoop.mapred.Reporter;
  * the {@link CombineWholeFileInputFormat} could be used to batch them together
  * into a configurable number of map tasks.
  */
-public class ByteArrayFileInputFormat extends FileInputFormat<Text, BytesWritable> {
+public class BlobFileInputFormatSMUndefined extends FileInputFormat<Text, BytesWritable> {
 
-	private static final Logger LOG = Logger.getLogger(ByteArrayFileInputFormat.class.getName());
+	private static final Logger LOG = Logger.getLogger(BlobFileInputFormatSMUndefined.class.getName());
 
 	@Override
 	protected boolean isSplitable(FileSystem fs, Path filename) {
@@ -38,19 +35,18 @@ public class ByteArrayFileInputFormat extends FileInputFormat<Text, BytesWritabl
 		return new WholeFileRecordReader(split, conf);
 	}
 
-	public static class WholeFileRecordReader implements
-			RecordReader<Text, BytesWritable> {
+	public static class WholeFileRecordReader implements RecordReader<Text, BytesWritable> {
 
-		private boolean read = false;
+		private boolean readComplete = false;
 		private FileSystem fs = null;
 		private FileSplit fSplit = null;
 		private String filename=null;
 		FSDataInputStream inStream=null;
-		byte[] buffer = new byte[4];
+
 
 		public WholeFileRecordReader(InputSplit split, JobConf conf)
 				throws IOException {
-			read = false;
+			readComplete = false;
 
 			fSplit = (FileSplit) split;
 
@@ -66,25 +62,59 @@ public class ByteArrayFileInputFormat extends FileInputFormat<Text, BytesWritabl
 
 		}
 
+		private StateMachine sm = new StateMachine();
+		private String prevHex="";
+		private String bigHex="";
+		private String bits="";
+		private String parsed="";
+		private long serial=0;
+
+		StateCommand command;
+		StateCommand undefinedCmd= StateCommandUndefined.getInstance();
+		boolean isTransit=false;
+
 		@Override
 		public boolean next(Text key, BytesWritable value) throws IOException {
 
-			if (read) {
-				LOG.info("BlobFileInputFormatStateMachine finish! ");
+			if (readComplete) {
+				LOG.info("BlobFileInputFormatSMUndefined finish! ");
 				return false;
 			}
 			key.set(filename);
 			try {
-				if (inStream.read(buffer) >= 0 ) {
-					value.set(Utils.getBigEndian(buffer), 0, 4);
-				}else{
-					read=true;
+
+				byte[] bufferFinal = new byte[4];
+				String result=null;
+				while (inStream.read(bufferFinal) >= 0) {
+					serial++;
+
+					if (serial % 1000000==0) {
+						LOG.info(String.format("%s, %s", filename, serial));
+					}
+
+					if(sm.isIgnoreCommand(bufferFinal)){
+						continue;
+					}
+					isTransit = sm.transit(bufferFinal);
+					bits = StateCommand.byteToBits(bufferFinal);
+					bigHex = StateCommand.bytesToHex(bufferFinal);
+					parsed = StateCommand.parse(bufferFinal);
+					command= sm.getTrialValueHolder().triedCommand;
+
+					if(!undefinedCmd.equals(command)){
+						continue;
+					}
+					result = String.format("%10s, %s, %s, %s, %s\n", serial, sm, sm.findStateCommand(bufferFinal).getName(), bits, parsed);
+					value.set(result.getBytes(), 0, result.getBytes().length);
+					return true;
 				}
-				return true;
+				readComplete = true;
+				return false;
 
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
+
 		}
 
 		@Override
@@ -96,7 +126,7 @@ public class ByteArrayFileInputFormat extends FileInputFormat<Text, BytesWritabl
 
 		@Override
 		public float getProgress() throws IOException {
-			return read ? 1 : 0;
+			return readComplete ? 1 : 0;
 		}
 
 		@Override

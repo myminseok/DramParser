@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.logging.Logger;
 
 
-public class PxfPipesWholeFileCommandSMTest extends PxfUnit {
+public class PxfPipesWholeFileCommandSMUndefinedTest extends PxfUnit {
 
-	private static final Logger LOG = Logger.getLogger(PxfPipesWholeFileCommandSMTest.class.getName());
+	private static final Logger LOG = Logger.getLogger(PxfPipesWholeFileCommandSMUndefinedTest.class.getName());
 
 	private static List<Pair<String, DataType>> columnDefs = null;
 	private static List<Pair<String, String>> extraParams = new ArrayList<Pair<String, String>>();
@@ -64,12 +64,12 @@ public class PxfPipesWholeFileCommandSMTest extends PxfUnit {
 
 	@Override
 	public Class<? extends Fragmenter> getFragmenterClass() {
-		return com.pivotal.pxf.plugins.dramsm.WholeFileFragmenter.class;
+		return WholeFileFragmenterUndefined.class;
 	}
 
 	@Override
 	public Class<? extends ReadAccessor> getReadAccessorClass() {
-		return BlobAccessor.class;
+		return BlobAccessorUndefined.class;
 	}
 
 	@Override

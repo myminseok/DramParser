@@ -6,7 +6,15 @@ public abstract class StateCommand {
     byte bytes[] = new byte[]{0,0,0,0};
 
     public  enum type{
-        UND, NOP, REF, PRE, PDX, ACT, PDE, WR, RD, CKE_L, ZQC, SRE, SRX, MRS ;
+        UND("undefined"), NOP(""),DES("DESEL"), REF("AutoRefresh"), PRE("Precharge"), PDX("PDX"), ACT("Activate"), PDE("PDE"), WR("Write"), RD("Read"), CKE_L("CKE_L"), ZQC("ZQC"), SRE("SRE"), SRX("SRX"), MRS("MRS") ;
+
+        String name;
+        type(String name){
+            this.name=name;
+        }
+        public String toString(){
+            return this.name;
+        }
     }
 
     /**

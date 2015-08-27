@@ -105,6 +105,20 @@ vi /etc/gphd/pxf/conf/pxf-profiles.xml
     </plugins>
 </profile>
 
+
+<profile>
+    <name>dramsmUndefined</name>
+    <description>A profile for PXF Pipes using the entire file as input
+    </description>
+    <plugins>
+        <fragmenter>com.pivotal.pxf.plugins.dramsm.WholeFileFragmenterUndefined</fragmenter>
+        <accessor>com.pivotal.pxf.plugins.dramsm.BlobAccessorUndefined</accessor>
+        <resolver>com.pivotal.pxf.plugins.dramsm.BlobResolver</resolver>
+        <linebyline>false</linebyline>
+    </plugins>
+</profile>
+
+
 ```
 
 ## restart pxf.
@@ -187,10 +201,18 @@ CREATE EXTERNAL TABLE javatest.dramsm ( file TEXT, serial FLOAT, result TEXT )
 LOCATION ('pxf://phd1.localdomain:51200/dramdata/testdata/*?Profile=dramsm')
 FORMAT 'custom' (Formatter='pxfwritable_import');
 
+drop external table javatest.dramsmUndefined;
+CREATE EXTERNAL TABLE javatest.dramsmUndefined ( file TEXT, serial FLOAT, result TEXT )
+LOCATION ('pxf://phd1.localdomain:51200/dramdata/testdata/*?Profile=dramsmUndefined')
+FORMAT 'custom' (Formatter='pxfwritable_import');
 
 
 
 select count(*) from javatest.dram;
+
+select count(*) from javatest.dramsm;
+
+select count(*) from javatest.dramsmUndefined;
 
 select * from javatest.dram group by key, serial,bits order by key, serial limit 100;
 

@@ -17,20 +17,20 @@ import java.util.logging.Logger;
 /**
  * A WholeFileFragmenter, which creates a single Fragment for every input file
  */
-public class 	WholeFileFragmenter extends Fragmenter {
-	private static final Logger LOG = Logger.getLogger(WholeFileFragmenter.class.getName());
+public class WholeFileFragmenterUndefined extends Fragmenter {
+	private static final Logger LOG = Logger.getLogger(WholeFileFragmenterUndefined.class.getName());
 
 	private Path inputPath = null;
 	private JobConf conf = new JobConf();
 	private FileInputFormat<?, ?> format = null;
 
-	public WholeFileFragmenter(InputData data) throws InstantiationException,
+	public WholeFileFragmenterUndefined(InputData data) throws InstantiationException,
 			IllegalAccessException {
 		super(data);
 
 		inputPath = new Path(data.getDataSource());
 		LOG.info("inputPath:"+inputPath);
-		format = new BlobFileInputFormatStateMachine();
+		format = new BlobFileInputFormatSMUndefined();
 	}
 
 	@Override
