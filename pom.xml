@@ -16,7 +16,7 @@
 	</prerequisites>
 
 	<modules>
-		<module>springxd-dramparser</module>
+		<module>dram-xdmodule</module>
 		<module>dram-pljava</module>
 		<module>dram-pxf</module>
 	</modules>

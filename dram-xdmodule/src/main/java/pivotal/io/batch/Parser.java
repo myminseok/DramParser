@@ -10,15 +10,15 @@ import java.util.Map;
 
 public class Parser {
 
-    private String infilepath=null;
-    private String outdirpath=null;
+    private String infile =null;
+    private String outdir =null;
 
 
-    public Parser(String infilepath, String outdirpath){
-        this.infilepath=infilepath;
-        this.outdirpath=outdirpath;
-        System.out.println("infilepath:"+infilepath);
-        System.out.println("outdirpath:"+outdirpath);
+    public Parser(String infile, String outdir){
+        this.infile = infile;
+        this.outdir = outdir;
+        System.out.println("infile:"+ infile);
+        System.out.println("outdir:"+ outdir);
     }
 
 
@@ -47,15 +47,15 @@ public class Parser {
 
         long lStartTime = System.currentTimeMillis();
 
-        File infile = new File(infilepath);
+        File infile = new File(this.infile);
 
-        File outfileUnique = new File(outdirpath+File.separator+infile.getName()+".unique.csv");
-        File outfiletransit = new File(outdirpath+File.separator+infile.getName()+".transit.csv");
-        File outfileinvalid = new File(outdirpath+File.separator+infile.getName()+".undefined.csv");
+        File outfileUnique = new File(outdir +File.separator+infile.getName()+".unique.csv");
+        File outfiletransit = new File(outdir +File.separator+infile.getName()+".transit.csv");
+        File outfileinvalid = new File(outdir +File.separator+infile.getName()+".undefined.csv");
 
         if(!infile.exists()){
-            System.out.println("file not found:"+infilepath);
-            throw new FileNotFoundException(infilepath);
+            System.out.println("file not found:"+ this.infile);
+            throw new FileNotFoundException(this.infile);
         }
 
         InputStream is=null;

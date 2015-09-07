@@ -1,3 +1,103 @@
+Test procedure
+=============================
+
+## build package
+	$ DramParser > mvn clean package
+	
+## Start the spring xd
+	xd/bin>$ ./xd-singlenode
+	
+## Start HDFS
+    hdfs://namenode:8020/
+	
+	# create hdfs target directory
+	hdfs dfs -mkdir /tmp/xd
+	hdfs dfs -chmod 777 /tmp/xd
+	
+	see http://docs.spring.io/spring-xd/docs/current/reference/html/#hadoop-hdfs
+	
+
+## Upload dram module on to the spring xd
+
+
+	stream destroy --name dram
+	job destroy --name dramjob
+
+
+	module delete --name job:drammodule
+	module upload --type job --name drammodule --file  /PATH/TO/DramParser/dram-xdmodule/target/dram-xdmodule-1.0.0-SNAPSHOT.jar
+	module info job:drammodule
+
+
+	# rollover * 4byte =  each splitted file size
+	job destroy --name dramjob
+	job create --name dramjob --definition "drammodule --outdir=/tmp/xd --fsUri=hdfs://namenode:8020/ --rollover=1000000" --deploy
+
+
+	stream destroy --name dram
+	stream create --name dram --definition "file --mode=ref --dir=/PATH/TO/dramdata > queue:job:dramjob " --deploy
+
+
+	# option
+	stream destroy --name dramtap
+    stream create --name dramtap --definition "tap:job:dramjob.job> file" --deploy
+    # option
+    stream destroy --name dramtapcounter
+    stream create --name dramtapcounter --definition "tap:job:dramjob.job> file" --deploy
+
+
+
+## place source data
+
+	ls /PATH/TO/dramdata
+	
+	rawdata1.txt
+	rawdata2.txt
+    	
+## check out result 
+
+### 1. spring xd log
+    ```
+    Starting DRAM file splitter
+    infile:/Users/kimm5/_dev/DramParser/src/test/data/sample/rawdata.txt.sample.0
+    outdir:/tmp/xd
+    fsUri:hdfs://192.168.65.201:8020/
+    rollover:1000000
+    The following 2 Job Parameter(s) is/are present:
+    	Parameter name: random; isIdentifying: true; type: STRING; value: 0.87854384099863
+    	Parameter name: absoluteFilePath; isIdentifying: true; type: STRING; value: /Users/kimm5/_dev/DramParser/src/test/data/sample/rawdata.txt.sample.1
+    absoluteFilePath:/Users/kimm5/_dev/DramParser/src/test/data/sample/rawdata.txt.sample.1
+    output:hdfs://192.168.65.201:8020///tmp/xd/rawdata.txt.sample.1-0
+    output:hdfs://192.168.65.201:8020///tmp/xd/rawdata.txt.sample.1-0
+    output:hdfs://192.168.65.201:8020///tmp/xd/rawdata.txt.sample.1-1
+    output:hdfs://192.168.65.201:8020///tmp/xd/rawdata.txt.sample.1-2
+    output:hdfs://192.168.65.201:8020///tmp/xd/rawdata.txt.sample.1-3
+    00:00:00.788
+    ```
+
+### hdfs
+	```
+	lsr: DEPRECATED: Please use 'ls -R' instead.
+    drwxrwxrwx   - kimm5 hdfs          0 2015-09-07 18:58 /tmp/xd
+    -rw-r--r--   3 kimm5 hdfs    1000000 2015-09-07 18:58 /tmp/xd/rawdata.txt.sample.0-0
+    -rw-r--r--   3 kimm5 hdfs    1000000 2015-09-07 18:58 /tmp/xd/rawdata.txt.sample.0-1
+    -rw-r--r--   3 kimm5 hdfs    1000000 2015-09-07 18:58 /tmp/xd/rawdata.txt.sample.0-2
+    -rw-r--r--   3 kimm5 hdfs    1000000 2015-09-07 18:58 /tmp/xd/rawdata.txt.sample.0-3
+    -rw-r--r--   3 kimm5 hdfs    1000000 2015-09-07 18:58 /tmp/xd/rawdata.txt.sample.1-0
+    -rw-r--r--   3 kimm5 hdfs    1000000 2015-09-07 18:58 /tmp/xd/rawdata.txt.sample.1-1
+    -rw-r--r--   3 kimm5 hdfs    1000000 2015-09-07 18:58 /tmp/xd/rawdata.txt.sample.1-2
+    -rw-r--r--   3 kimm5 hdfs    1000000 2015-09-07 18:58 /tmp/xd/rawdata.txt.sample.1-3
+    [hdfs@t-phd1 ~]
+	```
+
+
+now run [dram-pxf].
+
+
+
+
+
+
 Spring XD
 =============================
 
@@ -80,8 +180,8 @@ First install the module using the `module upload` command:
 
 You will now create a new Batch Job Stream using the *Spring XD Shell*:
 
-	xd:>job create --name dramjob --definition "dramparser --outdirpath=/tmp/xd " --deploy
-	    job create --name dramjob --definition "dramparser --outdirpath=/tmp/xd --outfileextension=xxx" --deploy
+	xd:>job create --name dramjob --definition "dramparser --outdir=/tmp/xd " --deploy
+	    job create --name dramjob --definition "dramparser --outdir=/tmp/xd --outfileextension=xxx" --deploy
 
         stream create --name dram --definition "file --mode=ref --dir=/Users/kimm5/_dev/DramParser/src/test/resources/testdata > queue:job:dramjob " --deploy
 
@@ -142,3 +242,7 @@ Follow the instructions in the module's [xml] configuration to have batch job wi
 [Spring Boot Gradle Plugin]: http://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/html/build-tool-plugins-gradle-plugin.html
 [propdeps plugin]: https://github.com/spring-projects/gradle-plugins/tree/master/propdeps-plugin
 [Modules]: http://docs.spring.io/spring-xd/docs/current/reference/html/#modules
+
+
+
+

@@ -9,14 +9,15 @@
 
 	<batch:job id="job">
 		<batch:step id="step1">
-			<batch:tasklet ref="DRAMFileParserTasklet" />
+			<batch:tasklet ref="Tasklet" />
 		</batch:step>
 	</batch:job>
 
-	<bean id="DRAMFileParserTasklet"
-		class="pivotal.io.batch.DRAMFileParserTasklet">
-		<property name="outdirpath" value="${outdirpath}"/>
-		<property name="outfileextension" value="${outfileextension}"/>
+	<bean id="Tasklet"
+		class="pivotal.io.batch.FileSplitAndHDFSSinkTasklet">
+		<property name="outdir" value="${outdir}"/>
+		<property name="fsUri" value="${fsUri}"/>
+		<property name="rollover" value="${rollover}"/>
 	</bean>
 
 </beans>

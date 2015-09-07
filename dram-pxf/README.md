@@ -1,6 +1,8 @@
 # PXF module for DRAM test data
 
 
+
+
 ## dependency
 
 ```
@@ -135,19 +137,33 @@ tail -f /var/gphd/pxf/pxf-service/logs/*
 ## dumy query
 
 
-CREATE EXTERNAL TABLE dummy_tbl (int1 integer, word text, int2 integer)
-location
-('pxf://localhost:51200/dummy_location?FRAGMENTER=com.pivotal.pxf.plugins.dummy.DummyFragmenter&ACCESSOR=com.pivotal.pxf.plugins.dummy.DummyAccessor&RESOLVER=com.pivotal.pxf.plugins.dummy.DummyResolver&ANALYZER=com.pivotal.pxf.plugins.dummy.DummyAnalyzer')
- format 'custom' (formatter = 'pxfwritable_import');
-
-
- CREATE WRITABLE EXTERNAL TABLE dummy_tbl_write (int1 integer, word text, int2 integer)
- location
- ('pxf://localhost:51200/dummy_location?ACCESSOR=com.pivotal.pxf.plugins.dummy.DummyAccessor&RESOLVER=com.pivotal.pxf.plugins.dummy.DummyResolver')
- format 'custom' (formatter = 'pxfwritable_export');
+    CREATE EXTERNAL TABLE dummy_tbl (int1 integer, word text, int2 integer)
+    location ('pxf://localhost:51200/dummy_location?FRAGMENTER=com.pivotal.pxf.plugins.dummy.DummyFragmenter&ACCESSOR=com.pivotal.pxf.plugins.dummy.DummyAccessor&RESOLVER=com.pivotal.pxf.plugins.dummy.DummyResolver&ANALYZER=com.pivotal.pxf.plugins.dummy.DummyAnalyzer')
+    format 'custom' (formatter = 'pxfwritable_import');
+    
+    
+    CREATE WRITABLE EXTERNAL TABLE dummy_tbl_write (int1 integer, word text, int2 integer)
+    location
+    ('pxf://localhost:51200/dummy_location?ACCESSOR=com.pivotal.pxf.plugins.dummy.DummyAccessor&RESOLVER=com.pivotal.pxf.plugins.dummy.DummyResolver')
+    format 'custom' (formatter = 'pxfwritable_export');
  　
  
  
+    /usr/local/hawq/bin/psql 
+    
+    create schema javatest;
+    
+    drop external table javatest.dram;
+    CREATE EXTERNAL TABLE dram ( key TEXT, serial FLOAT, bits TEXT )
+    LOCATION ('pxf://phd1.localdomain:51200/dramdata/sampledata/*?Profile=dram')
+    FORMAT 'custom' (Formatter='pxfwritable_import');
+    
+    
+    drop external table javatest.dram;
+    CREATE EXTERNAL TABLE dram ( key TEXT, serial FLOAT, bits TEXT )
+    LOCATION ('pxf://phd1.localdomain:51200/dramdata/sampledata/rawdata.txt.sample.0?Profile=dram')
+    FORMAT 'custom' (Formatter='pxfwritable_import');
+
  
 
 ## upload test data file to hdfs :
@@ -169,26 +185,13 @@ location
 
 ## test query
  
-/usr/local/hawq/bin/psql 
 
-
-drop external table javatest.dram;
-CREATE EXTERNAL TABLE dram ( key TEXT, serial FLOAT, bits TEXT )
-LOCATION ('pxf://phd1.localdomain:51200/dramdata/sampledata/*?Profile=dram')
-FORMAT 'custom' (Formatter='pxfwritable_import');
-
-
-drop external table javatest.dram;
-CREATE EXTERNAL TABLE dram ( key TEXT, serial FLOAT, bits TEXT )
-LOCATION ('pxf://phd1.localdomain:51200/dramdata/sampledata/rawdata.txt.sample.0?Profile=dram')
-FORMAT 'custom' (Formatter='pxfwritable_import');
-
-
+create schema javatest;
+  
 drop external table javatest.dramsm;
 CREATE EXTERNAL TABLE javatest.dramsm ( file TEXT, serial FLOAT, result TEXT )
 LOCATION ('pxf://phd1.localdomain:51200/dramdata/sampledata/rawdata.txt.sample.0?FRAGMENTER=com.pivotal.pxf.plugins.dramsm.WholeFileFragmenter&ACCESSOR=com.pivotal.pxf.plugins.dramsm.BlobAccessor&RESOLVER=com.pivotal.pxf.plugins.dramsm.BlobResolver')
 FORMAT 'custom' (Formatter='pxfwritable_import');
-
 
 drop external table javatest.dramsm;
 CREATE EXTERNAL TABLE javatest.dramsm ( file TEXT, serial FLOAT, result TEXT )
@@ -198,25 +201,21 @@ FORMAT 'custom' (Formatter='pxfwritable_import');
 
 drop external table javatest.dramsm;
 CREATE EXTERNAL TABLE javatest.dramsm ( file TEXT, serial FLOAT, result TEXT )
-LOCATION ('pxf://phd1.localdomain:51200/dramdata/testdata/*?Profile=dramsm')
+LOCATION ('pxf://t-phd4.localdomain:51200/sampledata/*?Profile=dramsm')
 FORMAT 'custom' (Formatter='pxfwritable_import');
 
 drop external table javatest.dramsmUndefined;
 CREATE EXTERNAL TABLE javatest.dramsmUndefined ( file TEXT, serial FLOAT, result TEXT )
-LOCATION ('pxf://phd1.localdomain:51200/dramdata/testdata/*?Profile=dramsmUndefined')
+LOCATION ('pxf://node1.localdomain:51200/sampledata/*?Profile=dramsmUndefined')
 FORMAT 'custom' (Formatter='pxfwritable_import');
 
 
 
-select count(*) from javatest.dram;
-
-select count(*) from javatest.dramsm;
-
 select count(*) from javatest.dramsmUndefined;
 
+create table dramdata_yyyymmdd_result as select * javatest.dramsmUndefined;
+
 select * from javatest.dram group by key, serial,bits order by key, serial limit 100;
-
-
 
 
  # ref

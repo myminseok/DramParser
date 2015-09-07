@@ -21,47 +21,59 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.xd.module.options.spi.ModuleOption;
 
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
 
-public class DRAMFileParserTasklet implements Tasklet, StepExecutionListener {
+public class FileSplitAndHDFSSinkTasklet implements Tasklet, StepExecutionListener {
 
+	private static final Logger logger = Logger.getLogger(FileSplitAndHDFSSinkTasklet.class.getName());
 	private volatile AtomicInteger counter = new AtomicInteger(0);
 
-	private String infilepath=null;
-	private String outdirpath=null;
-	private String outfileextension=null;
 
-	public String getInfilepath() {
-		return infilepath;
+	private String infile =null;
+
+	private String outdir =null;
+
+	private String fsUri;
+
+	private String rollover;
+
+	public String getInfile() {
+		return infile;
 	}
 
-	public String getOutdirpath() {
-		return outdirpath;
+	public void setInfile(String infile) {
+		this.infile = infile;
 	}
 
-	public String getOutfileextension() {
-		return outfileextension;
+	public String getOutdir() {
+		return outdir;
 	}
 
-	public void setInfilepath(String infilepath) {
-		this.infilepath = infilepath;
+	public void setOutdir(String outdir) {
+		this.outdir = outdir;
 	}
 
-	public void setOutdirpath(String outdirpath) {
-		this.outdirpath = outdirpath;
+	public String getFsUri() {
+		return fsUri;
 	}
 
-	public void setOutfileextension(String extension) {
-		this.outfileextension = extension;
+	public void setFsUri(String fsUri) {
+		this.fsUri = fsUri;
 	}
 
+	public String getRollover() {
+		return rollover;
+	}
 
+	public void setRollover(String rollover) {
+		this.rollover = rollover;
+	}
 
-	public DRAMFileParserTasklet() {
+	public FileSplitAndHDFSSinkTasklet() {
 		super();
 	}
 
@@ -71,18 +83,16 @@ public class DRAMFileParserTasklet implements Tasklet, StepExecutionListener {
 		final JobParameters jobParameters = chunkContext.getStepContext().getStepExecution().getJobParameters();
 		final ExecutionContext stepExecutionContext = chunkContext.getStepContext().getStepExecution().getExecutionContext();
 
-		System.out.println("Starting DRAM data parser");
-		System.out.println("infilepath:"+infilepath);
-		System.out.println("outdirpath:"+outdirpath);
-		System.out.println("outfileextension:"+outfileextension);
+		logger.info("log Starting DRAM file splitter");
+		System.out.println("Starting DRAM file splitter");
+		System.out.println("infile:"+ infile);
+		System.out.println("outdir:"+ outdir);
+		System.out.println("fsUri:"+fsUri);
+		System.out.println("rollover:"+rollover);
 
 		if (jobParameters != null && !jobParameters.isEmpty()) {
-
 			final Set<Entry<String, JobParameter>> parameterEntries = jobParameters.getParameters().entrySet();
-
 			System.out.println(String.format("The following %s Job Parameter(s) is/are present:", parameterEntries.size()));
-
-
 
 			//Parameter name: absoluteFilePath; isIdentifying: true; type: STRING; value: /Users/kimm5/_dev/skhynix/testdata/sample2
 			for (Entry<String, JobParameter> jobParameterEntry : parameterEntries) {
@@ -98,8 +108,8 @@ public class DRAMFileParserTasklet implements Tasklet, StepExecutionListener {
 				}
 
 				if("absoluteFilePath".equals(jobParameterEntry.getKey())){
-					infilepath=jobParameterEntry.getValue().getValue().toString();
-					System.out.println("jobparam: infilepath(absoluteFilePath):"+infilepath);
+					infile =jobParameterEntry.getValue().getValue().toString();
+					System.out.println("absoluteFilePath:"+ infile);
 				}
 
 			}
@@ -119,15 +129,15 @@ public class DRAMFileParserTasklet implements Tasklet, StepExecutionListener {
 
 
 
-			run(infilepath, outdirpath, outfileextension);
+			run(infile, outdir, fsUri, rollover);
 		}
 		return RepeatStatus.FINISHED;
 	}
 
 
-	private void run(String infilepath, String outdirpath, String outfileextension) throws Exception{
+	private void run(String infilepath, String outdirpath, String fsUri, String rollover) throws Exception{
 
-		(new Parser(infilepath, outdirpath)).execute();
+		(new DataFileSplit()).execute(infilepath, outdirpath, fsUri, rollover);
 
 	}
 
