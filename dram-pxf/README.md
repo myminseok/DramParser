@@ -1,7 +1,41 @@
 # PXF module for DRAM test data
 
+Test procedure summary
+============================================
 
 
+## upload pxf module
+
+    scp dram-pxf-1.0.0-SNAPSHOT.jar      node1:/usr/lib/gphd/pxf/
+    scp dram-xdmodule-1.0.0-SNAPSHOT.jar node1:/usr/lib/gphd/pxf/
+    scp pmr-common-2.0.1.0-1.jar         node1:/usr/lib/gphd/pxf/
+     
+    ssh node1 "chmod 644 /usr/lib/gphd/pxf/*.jar"
+    
+    scp *.classpath node1:/etc/gphd/pxf/
+    
+    scp ./pxf-profiles.xml node1:/etc/gphd/pxf/conf/pxf-profiles.xml
+    
+    scp ./pxf-private.classpath node1:/etc/gphd/pxf/conf/
+    
+    ssh node1 "service pxf-service restart"
+    
+## upload test data
+    
+    hdfs://namenode:8020/user/pxf/sampledata/*
+    
+## run pxf query on HAWQ
+    drop external table javatest.dramsmUndefined;
+    CREATE EXTERNAL TABLE javatest.dramsmUndefined ( file TEXT, serial FLOAT, result TEXT )
+    LOCATION ('pxf://namenode:51200/sampledata/*?Profile=dramsmUndefined')
+    FORMAT 'custom' (Formatter='pxfwritable_import');
+    
+    
+    select * from javatest.dramsmUndefined;
+
+
+How to setup in detail
+============================================
 
 ## dependency
 
@@ -199,19 +233,21 @@ LOCATION ('pxf://phd1.localdomain:51200/dramdata/sampledata/rawdata.txt.sample.0
 FORMAT 'custom' (Formatter='pxfwritable_import');
 
 
-drop external table javatest.dramsm;
-CREATE EXTERNAL TABLE javatest.dramsm ( file TEXT, serial FLOAT, result TEXT )
-LOCATION ('pxf://t-phd4.localdomain:51200/sampledata/*?Profile=dramsm')
-FORMAT 'custom' (Formatter='pxfwritable_import');
-
 drop external table javatest.dramsmUndefined;
 CREATE EXTERNAL TABLE javatest.dramsmUndefined ( file TEXT, serial FLOAT, result TEXT )
 LOCATION ('pxf://node1.localdomain:51200/sampledata/*?Profile=dramsmUndefined')
 FORMAT 'custom' (Formatter='pxfwritable_import');
 
 
+drop external table javatest.dramsmUndefined;
+CREATE EXTERNAL TABLE javatest.dramsmUndefined ( file TEXT, serial FLOAT, result TEXT )
+LOCATION ('pxf://t-phd4.localdomain:51200/rawdata/*?Profile=dramsmUndefined')
+FORMAT 'custom' (Formatter='pxfwritable_import');
 
-select count(*) from javatest.dramsmUndefined;
+
+
+
+select * from javatest.dramsmUndefined;
 
 create table dramdata_yyyymmdd_result as select * javatest.dramsmUndefined;
 
