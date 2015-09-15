@@ -6,7 +6,8 @@ PHD-3.0.1.0
 PHD-UTILS-1.1.0.20
 
 # yum.repo 설치 방법
-1) 첨부의  phd3_rhel_rpms.tar.gz를 압축을 풉니다.
+1)  phd3_rhel_rpms.tar.gz를 받아서 압축을 풉니다.
+https://www.dropbox.com/sh/3k85u8orpstunw4/AACeLjx-3gWfP-t1WAVvDuIza?dl=0
 2) phd3_rhel_rpms/rpms폴더를  /var/www/html폴더 아래로 복사합니다.
 3) phd3_rhel_rpms/yum.repo.d/rpms.repo를 /etc/yum.repo.d/아래에 복사.
 4) rpms.repo의 nodeIP를 변경합니다.
