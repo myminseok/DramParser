@@ -15,7 +15,7 @@
 
 		<dependency>
 			<groupId>pivotal.io.batch</groupId>
-			<artifactId>springxd-dramparser</artifactId>
+			<artifactId>dram-xdmodule</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 

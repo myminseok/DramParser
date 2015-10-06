@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import com.pivotal.pxf.api.utilities.InputData;
 import com.pivotal.pxf.plugins.dramsm.BlobResolver;
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.apache.hadoop.fs.Path;
 import org.junit.After;
 import org.junit.Before;
@@ -48,7 +49,7 @@ public class PxfPipesWholeFileCommandTest extends PxfUnit {
 	}
 
 
-	@Test
+	//@Test
 	public void testDram() throws Exception {
 
 		setup(new Path(System.getProperty("user.dir")

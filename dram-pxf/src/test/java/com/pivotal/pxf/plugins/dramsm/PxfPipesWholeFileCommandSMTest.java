@@ -40,7 +40,7 @@ public class PxfPipesWholeFileCommandSMTest extends PxfUnit {
 	}
 
 
-	@Test
+	//@Test
 	public void testDram() throws Exception {
 
 		setup(new Path(System.getProperty("user.dir")

@@ -73,6 +73,7 @@ public class BlobFileInputFormatStateMachine extends FileInputFormat<Text, Bytes
 		private String bits="";
 		private String parsed="";
 		private long serial=0;
+		byte[] bufferFinal = new byte[4];
 
 		Command command;
 		Command undefinedCmd= CommandUndefined.getInstance();
@@ -85,15 +86,18 @@ public class BlobFileInputFormatStateMachine extends FileInputFormat<Text, Bytes
 				LOG.info("BlobFileInputFormatStateMachine finish! ");
 				return false;
 			}
+
+			long lStartTime = System.currentTimeMillis();
+
 			key.set(filename);
 			try {
 
-				byte[] bufferFinal = new byte[4];
+
 				String result=null;
 				while (inStream.read(bufferFinal) >= 0) {
 					serial++;
 
-					if (serial % 1000000==0) {
+					if (serial % 10000000==0) {
 						LOG.info(String.format("%s, %s", filename, serial));
 					}
 
@@ -114,7 +118,11 @@ public class BlobFileInputFormatStateMachine extends FileInputFormat<Text, Bytes
 					value.set(result.getBytes(), 0, result.getBytes().length);
 					return true;
 				}
+
 				readComplete = true;
+				long lEndTime = System.currentTimeMillis() - lStartTime;
+				LOG.info(String.format("COMPLETE %s, items: %s, elapsed:%s", filename, serial, GetFormattedInterval(lEndTime)));
+
 				return false;
 
 			} catch (IOException e) {
@@ -122,6 +130,20 @@ public class BlobFileInputFormatStateMachine extends FileInputFormat<Text, Bytes
 			}
 
 		}
+
+
+		public String GetFormattedInterval(final long ms) {
+			long millis = ms % 1000;
+			long x = ms / 1000;
+			long seconds = x % 60;
+			x /= 60;
+			long minutes = x % 60;
+			x /= 60;
+			long hours = x % 24;
+
+			return String.format("%02d:%02d:%02d.%03d", hours, minutes, seconds, millis);
+		}
+
 
 		@Override
 		public void close() throws IOException {

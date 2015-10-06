@@ -63,9 +63,6 @@ public class StateMachine {
         stateObjectMap.put(State.type.Reading,  StateReading.getInstance());
         stateObjectMap.put(State.type.Writing,  StateWriting.getInstance());
 
-        Set<Command.type> cmdSet = stateCommandAllMap.keySet();
-
-
     }
 
 
@@ -110,7 +107,18 @@ public class StateMachine {
             }
         }
         return false;
+
     }
+
+//    //for POC
+//    public boolean isIgnoreCommand(byte[] bytes){
+//
+//        if(CommandNOP.getInstance().isMatching(bytes)) return true;
+//        if(CommandDES.getInstance().isMatching(bytes)) return true;
+//
+//        return false;
+//
+//    }
 
 
     public Command findStateCommand(byte[] bytes){
@@ -127,6 +135,25 @@ public class StateMachine {
         }
         return CommandUndefined.getInstance();
     }
+
+//    // for poc
+//    public Command findStateCommand(byte[] bytes){
+//
+//        if(CommandNOP.getInstance().isMatching(bytes)) return CommandNOP.getInstance();
+//        if(CommandDES.getInstance().isMatching(bytes)) return CommandDES.getInstance();
+//        if(CommandREF.getInstance().isMatching(bytes)) return CommandREF.getInstance();
+//        if(CommandACT.getInstance().isMatching(bytes)) return CommandACT.getInstance();
+////        if(CommandCLEL.getInstance().isMatching(bytes)) return CommandCLEL.getInstance(); // remove
+//        if(CommandPDE.getInstance().isMatching(bytes)) return CommandPDE.getInstance();
+////        if(CommandPDX.getInstance().isMatching(bytes)) return CommandPDX.getInstance(); // remove
+//        if(CommandPRE.getInstance().isMatching(bytes)) return CommandPRE.getInstance();
+//        if(CommandRD.getInstance().isMatching(bytes)) return CommandRD.getInstance();
+//        if(CommandWR.getInstance().isMatching(bytes)) return CommandWR.getInstance();
+//        if(CommandZQC.getInstance().isMatching(bytes)) return CommandZQC.getInstance();
+//        if(CommandSRE.getInstance().isMatching(bytes)) return CommandZQC.getInstance();
+//        if(CommandMRS.getInstance().isMatching(bytes)) return CommandMRS.getInstance();
+//        return CommandUndefined.getInstance();
+//    }
 
     public Command.type getStateCommandType(byte[] bytes){
         return findStateCommand(bytes).getName();
