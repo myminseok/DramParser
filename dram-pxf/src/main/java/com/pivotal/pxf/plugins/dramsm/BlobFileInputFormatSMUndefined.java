@@ -11,6 +11,7 @@ import pivotal.io.batch.state.StateMachine;
 import pivotal.io.batch.command.Command;
 import pivotal.io.batch.command.CommandUndefined;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.util.logging.Logger;
 
@@ -42,7 +43,7 @@ public class BlobFileInputFormatSMUndefined extends FileInputFormat<Text, BytesW
 		private FileSplit fSplit = null;
 		private String filename=null;
 		FSDataInputStream inStream=null;
-
+		BufferedInputStream buffStream =null;
 
 		public WholeFileRecordReader(InputSplit split, JobConf conf)
 				throws IOException {
@@ -57,7 +58,11 @@ public class BlobFileInputFormatSMUndefined extends FileInputFormat<Text, BytesW
 			fs = FileSystem.get(conf);
 
 			// get the bytes of the file for the value
+
 			inStream = fs.open(fSplit.getPath());
+			buffStream= new BufferedInputStream(inStream);
+			//buffStream= new BufferedInputStream(fs.open(fSplit.getPath()));
+
 			filename = fSplit.getPath().getName();
 
 		}
@@ -87,8 +92,10 @@ public class BlobFileInputFormatSMUndefined extends FileInputFormat<Text, BytesW
 			key.set(filename);
 			try {
 
+
 				String result=null;
-				while (inStream.read(bufferFinal) >= 0) {
+
+				while (buffStream.read(bufferFinal) >= 0) {
 					serial++;
 
 					if (serial % 10000000==0) {
@@ -138,6 +145,9 @@ public class BlobFileInputFormatSMUndefined extends FileInputFormat<Text, BytesW
 		public void close() throws IOException {
 			if(inStream!=null){
 				inStream.close();
+			}
+			if(buffStream!=null){
+				buffStream.close();
 			}
 		}
 

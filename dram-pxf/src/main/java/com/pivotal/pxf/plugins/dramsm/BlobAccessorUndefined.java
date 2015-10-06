@@ -58,6 +58,7 @@ public class BlobAccessorUndefined extends HdfsSplittableDataAccessor {
 	protected Object getReader(JobConf conf, InputSplit split)
 			throws IOException {
 		try {
+			LOG.info("buffered@@@@@");
 			LOG.info("creating BlobFileInputFormatSMUndefined.WholeFileRecordReader()");
 			return new BlobFileInputFormatSMUndefined.WholeFileRecordReader(split, conf);
 		} catch (Exception e) {
